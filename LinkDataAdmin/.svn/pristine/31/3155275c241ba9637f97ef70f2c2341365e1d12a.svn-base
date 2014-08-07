@@ -1,0 +1,98 @@
+from gluon.scheduler import Scheduler
+ 
+sch_db = DAL('mysql://idexadmin:idex000@180.169.19.150/linkDataAdmin')
+ 
+
+def __createTagFile(projId, mode, filename):
+    import csv
+    import time
+    where = "SELECT ds_id,cookieId FROM Tag_%s " 
+    if mode == 'Incr':
+        where = where + "WHERE ti_id=0"
+    data = sch_db.executesql(where %projId) 
+    f = open(filename,"wb")
+    writer = csv.writer(f)
+    writer.writerow(['id','cookies','value'])
+    c = len(data);
+    i = 0
+    p = 10
+    print '0%'
+    for id,cookie in data:
+        writer.writerow([id,cookie,'None'])
+        i += 1        
+        d = i/c*100
+        if d >= p:
+            print '!clear!%d%%' %d
+            p += 10
+
+    f.close()
+    return 0
+
+def __updateTagDB(filename, tagProjId, logId):
+    import time
+    import os
+    import csv
+    fn = os.path.join(request.folder,'uploads',filename)
+    f = open(fn, 'r')
+    #print 'open file'
+    f.readline()
+    count = len(f.readlines())
+    lda_db(lda_db.tagSyncLog.id==logId).update(status='run', count=count)
+    #print count
+    f.seek(0)
+    f.readline()
+    reader = csv.reader(f)    
+    value = dict((v,i) for i,v in lda_db.executesql("SELECT ti_id,value FROM TagItem_%s" %tagProjId))
+    maxId = lda_db.executesql("SELECT max(ti_id) FROM TagItem_%s" %tagProjId)[0][0]
+    if not maxId:
+        maxId = 0
+
+    data = []
+    i = 0
+    p = 10
+    count = float(count)
+    #print 'start'
+    for id, _, v in reader:
+        i += 1
+        d = (i / count) * 100
+        if d > p:
+            p += 10
+            lda_db(lda_db.tagSyncLog.id==logId).update(up_count=i)
+            #time.sleep(10)
+
+        if v == 'None':
+            continue
+
+        v = v.decode('GBK')
+        ti = value.get(v, None)
+        if ti:
+            data.append('(%s,%d)' %(id,ti))
+        else:
+            maxId += 1
+            value[v] = maxId
+            lda_db.executesql("INSERT INTO TagItem_%s (ti_id,value) VALUES (%d,'%s')" %(tapProjId,maxId,v))
+            data.append('(%s,%d)' %(id,maxId))
+            
+    i = 0
+    c = len(data)
+    #print c
+    while i < c:
+        s = ','.join(data[i:i+5000])
+        lda_db.executesql("INSERT INTO Tag_%s (ds_id,ti_id) VALUES %s ON DUPLICATE KEY UPDATE ti_id=values(ti_id)" %(tagProjId, s))
+        i += 5000
+
+    tagCount = lda_db.executesql("SELECT ti_id,count(ds_id) FROM Tag_%s WHERE ti_id>0 group by ti_id" %tagProjId)
+    d = []
+    for i, c in tagCount:
+        d.append('(%d,%d)' %(i,c))
+    lda_db.executesql("INSERT INTO TagItem_%s (ti_id,count) values %s ON DUPLICATE KEY UPDATE count=values(count)" %(tagProjId, ','.join(d)))
+    lda_db(lda_db.tagSyncLog.id==logId).update(up_count=count, status='completed')
+    print 'end'
+    return 0
+ 
+tasks = dict(createTagFile=__createTagFile,
+                       updateTagDB=__updateTagDB,
+)
+ 
+scheduler = Scheduler(sch_db, tasks)
+

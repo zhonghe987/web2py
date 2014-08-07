@@ -1,0 +1,75 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+
+{{block plane}}
+<div class="panel-body">
+    <div class="table-control">
+    {{=form.custom.begin}}
+        <table width="900" class="bq">
+            <tr>
+                <td width="100" align="right">标签项目名称：</td>
+                <td width="160" align="left">{{=form.custom.widget.name}}</td>
+                <td width="100" align="right">数据源：</td>
+                <td width="160" align="left">{{=form.custom.widget.source}}</td>
+                <td width="120" align="center">{{=form.custom.submit}}</td>
+            </tr>
+        </table>
+    {{=form.custom.end}}
+    </div>
+</div>
+
+<div class="panel-body1">
+    <div class="delete-all">
+        您最多可创建 <font color="red">{{=session.user.dataSourceLimit}}</font> 个标签项目
+    </div>
+    <div class="add-user">
+        <button type="button" class="btn btn-primary" id='new'>新增标签项目</button>
+    </div>
+</div>
+
+<div class="panel-body">                           
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="5%">编号</th>
+                <th width="20%">项目名称</th>
+                <th width="20%">数据源</th>
+                <th width="15%">状态</th>
+                <th width="20%">创建时间</th>
+                <th width="20%">操作</th>
+            </tr>
+        </thead>
+        <tbody>
+        {{for i, d in enumerate(data):}}
+            <tr align="center">
+                <td>{{=i+1}}</td>
+                <td>{{=d.tagProj.tpName}}</td>
+                <td>{{='%s (%s)' %(d.dataSource.dsName,d.dataSource.cookieDomain)}}</td>
+                <td>{{=d.tagProj.tpStatus}}</td> 
+                <td>{{=d.tagProj.date}}</td>                                                  
+                <td><a href="{{=URL('sync',vars=dict(tpId=d.tagProj.tp_id,dsId=d.dataSource.d_id))}}">同步数据</a>&nbsp;&nbsp;
+                       <a href="#">编辑</a>&nbsp;&nbsp;
+                       <a href="#">删除</a>
+                </td>
+            </tr> 
+        {{pass}}
+        </tbody>
+    </table>
+</div>
+{{end}}
+
+
+{{block script}}
+<script>
+     jQuery(document).ready(function(){
+         jQuery('#no_table_name').attr('class','form-control form-input');
+         jQuery('#sub').attr('class','btn btn-primary btn-block');
+         jQuery("#no_table_source option:first ").remove();
+         jQuery("#new").attr("onclick","location='{{=URL('new')}}'");
+         jQuery("#side_tp").attr("id","now-nav");
+    });
+</script>
+{{end}}

@@ -1,0 +1,109 @@
+{{extend 'data_index.html'}}
+{{block new}}
+ 
+        <section class="main-content-wrapper">
+        	{{=form.custom.begin}}
+            <section id="main-content">
+            	
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--breadcrumbs start -->
+                        <ul class="breadcrumb">
+                            <li>数据源管理</li>
+                            <li>新增源管理</li>
+                        </ul>
+                        <!--breadcrumbs end -->
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">新增数据源</h3>
+                               
+                            </div>
+								<div class="panel-body bt-border">
+                                <form class="form-horizontal" role="form">
+                                
+                                <div class="form-title">基本信息</div>
+                               
+                                <table width="400" border="0" cellspacing="0" cellpadding="0">
+                                  <tr>
+                                    <td align="right" width="155">数据源名称：</td>
+                                    <td width="245">{{=form.custom.widget.name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">数据源域：</td>
+                                    <td width="245">{{=form.custom.widget.domain}}</td>
+                                  </tr>
+                                </table>
+                                </form>
+                            </div>
+                            <div class="panel-body bt-border">
+                                <div class="form-horizontal" role="form">
+                                <div class="form-title">KeyName信息</div>
+								<table width="700" border="0" cellspacing="0" cellpadding="0">
+                                  <tr>
+                                    <td align="right" width="155">KeyName1：</td>
+                                    <td width="192">{{=form.custom.widget.keyname1}}</td>
+                                    <td align="right" width="71">值长度：</td>
+                                    <td width="198">{{=form.custom.widget.keyname1_value}}</td>
+                                    <td width="84">&nbsp;&nbsp;字节</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">KeyName2：</td>
+                                    <td>{{=form.custom.widget.keyname2}}</td>
+                                    <td align="right" width="71">值长度：</td>
+                                    <td>{{=form.custom.widget.keyname2_value}}</td>
+                                    <td>&nbsp;&nbsp;字节</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">KeyName3：</td>
+                                    <td>{{=form.custom.widget.keyname3}}</td>
+                                    <td align="right" width="71">值长度：</td>
+                                    <td>{{=form.custom.widget.keyname3_value}}</td>
+                                    <td>&nbsp;&nbsp;字节</td>
+                                  </tr>
+                                </table>
+                               
+                                    <div class="form-group">
+                                    </div>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+                       
+                    </div>                     
+                    </div>
+                    <div class="col-md-12" align="center">
+                        {{=form.custom.submit}}
+                       </div>&nbsp;&nbsp;&nbsp;&nbsp;
+                     <div>
+                      <button type="submit" id= "go" class="btn" >取消 </button>
+            </div>
+
+            </section>
+        </section>
+         {{=form.custom.end}}
+        <!--main content end-->       
+    </section>
+        <!-- Basic Modal -->
+    <div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div class="modal-body">
+                    <p>数据源保存后只能删除，不能编辑，是否要继续保存？</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary">继续保存</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+ {{end}}

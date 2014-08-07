@@ -1,0 +1,402 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+{{block head}}
+<link rel="stylesheet"  href="{{=URL('static','plupload/js/jquery.plupload.queue/css/jquery.plupload.queue.css')}}">
+<link rel="stylesheet"  href="{{=URL('static','plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css')}}">
+<link rel="stylesheet" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/themes/base/jquery-ui.css"/>
+<script type="text/javascript" src="{{=URL('static','plupload/js/plupload.full.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','plupload/js/jquery.plupload.queue/jquery.plupload.queue.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','plupload/js/jquery.ui.plupload/jquery.ui.plupload.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','plupload/js/i18n/zh_CN.js')}}"></script>  
+{{end}}
+
+{{block plane}}
+<div class="panel-body bt-border">
+    <form class="form-horizontal" role="form">
+        <div class="form-title">项目信息</div>
+        <table width="400" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td align="right" width="155"><strong>项目名称：</strong></td>
+                <td width="245">{{=tagProjName}}</td>
+            </tr>
+            <tr>
+                <td align="right" width="155"><strong>数据源：</strong></td>
+                <td width="245">{{=dataSource}}</td>
+           </tr>
+        </table>
+    </form>
+</div>
+
+<div class="panel-body bt-border">
+    <div class="form-title">同步标签项</div>
+    <div class="bq">
+        <table width="100%" class="table1">
+            <tr align="center">
+                <td>已同步标签的cookie量：<span class="bqfont">{{=counted}}</span></td>
+                <td>未同步标签的cookie量：<span class="bqfont">{{=noCount}}</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="bq1">
+        
+        <table width="950" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td>请选择操作：</td>
+                <td><button id="downAll" type="button" class="btn btn-primary btn-square" data-toggle="modal" data-target="#downModal">下载全部cookie数据</button>&nbsp;&nbsp;</td>
+                <td><button id="downIncr" type="button" class="btn btn-primary btn-square" data-toggle="modal" data-target="#downModal">仅下载未同步的cookie数据</button>&nbsp;&nbsp;</td>
+               <!-- <td><input type="file" id="upload"  onchange="uploadFiles()"></td>-->
+               <td><button type="button" id="cookie" class="btn btn-primary btn-square" data-toggle="modal" data-target="#basicModal" >上传标记的cookie数据</button></td>
+            </tr> 
+        </table>                  
+    </div>
+    <div class="bq2">您也可以使用API接口来进行自动同步，<a href="#">查看API调用方法</a></div>
+    
+    <div class="panel-body bt-border">
+        <div class="bq1">
+            <p>历史同步</p>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th width="17%">时间</th>
+                        <th width="42%">同步Cookie量</th>
+                        <th width="41%">状态</th>
+                    </tr>
+                </thead>
+                <tbody id="tblSync" projId="{{=projId}}", count="{{=dataCount}}">
+                </tbody>
+            </table>
+
+            <div class="mpage">
+                <div class="col-xs-6">
+                    <div class="dataTables_info">共 {{=dataCount}} 条信息</div>
+                </div>
+                <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                        <ul class="pagination">
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
+
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" id="close_button" class="fa fa-times-circle-o close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title" id="myModalLabel">文件上传</h4>
+            </div>
+            
+            <form id ='uploadForms' class="modal-body">
+            	   <div id='upload'></div>
+            </form>
+                         
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in" id="downModal" tabindex="-1" role="dialog" aria-labelledby="downModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="downModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div id="downProgress" class="progress-bar progress-bar-success" style="width: 10%">10%</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDown" type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+           </div>
+        </div>
+    </div>
+</div>
+<a id="updateSync" class="hide"> </a>
+{{end}}
+
+{{block script}}
+jQuery('#downAll').click(function(){downCookiesFile("All")});
+jQuery('#downIncr').click(function(){downCookiesFile("Incr")});
+jQuery('#sub').attr('class', 'btn btn-primary btn-square');
+jQuery('#no_table_filename').attr('class', 'btn-square');
+jQuery("#side_tp").attr("id","now-nav");
+jQuery("#close_button").click(function(){
+	window.location.reload();
+});
+jQuery(".pagination li:eq(1)").attr('class', 'paginate_button active');
+
+function plupload(){
+    $("#upload").pluploadQueue({
+    runtimes : 'gears,flash,silverlight,browserplus,html5',
+    url:'{{=URL('uploadFiles')}}',
+    rename: true,
+    //dragdrop: true,
+    chunk_size : '2mb',
+    //multiple_queues: true,
+    unique_names: true,
+    flash_swf_url:'{{=URL('static','plupload/js/Moxie.swf')}}',
+    filters: [{ title: "file", extensions: "csv" },],
+    silverlight_xap_url: '{{=URL('static','plupload/js/Moxie.xap')}}',
+    //multipart:false,
+    multipart_params: {"tagProjId":jQuery("#tblSync").attr('projId')},
+});
+}
+plupload();
+jQuery('#cookie').click(function(){
+	var valm = $("#basicModal").attr('class');
+	var sty = $("#basicModal").css('display');
+	if(valm == "modal fade" | sty =="none;"){
+		$("#basicModal").attr("class",'modal fade in');
+        $("#basicModal").css('display','block');
+		
+	}else{
+		$("#basicModal").attr("class",'modal fade');
+        $("#basicModal").css('display','none');
+	}
+	plupload();
+	var upload = $("#upload").pluploadQueue();
+    upload.bind('FilesAdded',function(up, files){
+    $.each(files,function(i,file){
+        if(up.files.length > 1){
+            up.removeFile(file);
+        }
+    });
+    });
+    upload.bind('UploadComplete', function(up, file, res) {
+    $("#basicModal").attr("class",'modal fade');
+    $("#basicModal").css('display','none'); 
+    $(".modal-backdrop").remove();
+    // 上传回调函数
+    jQuery("#updateSync").click();
+    });
+    
+});
+
+
+
+timer = new Array();
+createPagination({{=pageCount}}, timer)
+
+s = "{{=syncData}}";
+data = s.replace(/&quot;/g,"\"");
+data = eval(data);
+tbl = jQuery("#tblSync"); 
+for (var i=0; i<data.length; i++){
+     td = $("<td></td>");
+    tr = createSyncLogRow(data[i], td, timer);
+    tbl.append(tr);
+}
+
+a = jQuery("#updateSync");
+a.click(function () {
+    $.ajax({
+        type: "post",
+        url: "{{=URL('syncPaginate')}}",
+        data: {'page':1,'projId':jQuery("#tblSync").attr('projId'), "reCount":true},
+        dataType: "json",
+        success: function(data){//成功时执行函数
+            createPagination(data.pageCount, timer);
+            tbl = jQuery("#tblSync"); 
+            tbl.children().remove();
+            for(var i=0; i<data.syncData.length; i++) {
+                   td = $("<td></td>");
+                tr = createSyncLogRow(data.syncData[i], td, timer);
+                tbl.append(tr);
+            }
+            
+            d = jQuery(".dataTables_info").text("共 "+data.dataCount+" 条信息");
+        }
+     });
+});
+{{end}}
+
+{{block script func}}
+function createPagination(pageCount, timer){
+    ul = jQuery(".pagination");
+    ul.children().remove();
+    if (pageCount > 1)
+    {
+        ul = jQuery(".pagination");
+        //alert(ul.html());
+        ul.append('<li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>');
+        pc = pageCount + 1
+        for(var i=1; i < pc; i++){
+              li = $('<li class="paginate_button" aria-controls="example"></li>');
+            a = $('<a href="#tblSync"></a>');
+            a.text(i);
+            a.click(function () {  
+                  //alert('click');
+                  jQuery('.paginate_button.active').removeClass('active');
+                  $(this).parent().addClass('active');
+                  $.ajax({
+                    type: "post",
+                    url: "{{=URL('syncPaginate')}}",
+                    data: {'page':$(this).text(),'projId':jQuery("#tblSync").attr('projId')},
+                    dataType: "json",
+                    success: function(data){//成功时执行函数
+                                       //alert( "回调成功！"+data.syncData[0].date);
+                                       clearTimer(timer);
+                                       tbl = jQuery("#tblSync"); 
+                                       tbl.children().remove();
+                                       for(var i=0; i<data.syncData.length; i++){
+                                            td = $("<td></td>");
+                                            tr = createSyncLogRow(data.syncData[i], td, timer);
+                                            tbl.append(tr);
+                                       }
+                     }
+                 });
+            });  
+            li.append(a);
+            ul.append(li);
+         }
+        ul.append('<li class="paginate_button next disabled" aria-controls="example" tabindex="-1" id="example_next"><a href="#">Next</a></li>');
+        ul.children("li").eq(1).addClass('active');
+    }
+}
+
+function downCookiesFile(mode){
+    //alert(mode);
+    jQuery("#downModalLabel").text("正在处理命令"); 
+    jQuery("#downProgress").text("5%");   
+    jQuery("#downProgress").attr("style", "width: 5%");
+    var bCancel = false;
+    jQuery("#cancelDown").click(function(){bCancel = true;});
+    $.ajax({
+        type: "post",
+        url: "{{=URL('createCSV')}}",
+        data: {"mode":mode, "projId":jQuery("#tblSync").attr('projId')},
+        dataType: "json",
+        success: function(data){
+             //alert(data.taskId);
+             jQuery("#downModalLabel").text("正在生成文件:"+data.filename);              
+             //var i = 0
+             if (bCancel){
+                 return true
+             }
+             var t = setInterval(function(){
+                 $.ajax({
+                     type: "post",
+                     url: "{{=URL('getTaskProgress')}}",
+                     data: {"taskId":data.taskId},
+                     dataType: "json",
+                     success:function(msg){
+                         //alert(msg.status);
+                         jQuery("#downProgress").text(msg.progress);   
+                         jQuery("#downProgress").attr("style", "width: "+msg.progress);
+                         if(msg.status=="COMPLETED")
+                         {
+                             clearInterval(t);
+                             setTimeout(function(){
+                                 jQuery("#cancelDown").click(); 
+                             },2000);
+                             location="downFile?filename="+data.filename;
+                         }
+                     }
+                 }); },2000); 
+
+              jQuery("#cancelDown").click(function(){
+                  clearInterval(t)
+              });
+        }
+    });
+}
+
+function createSyncLogRow(data, td, timer){
+    tr = $('<tr align="center"></tr>');
+    td.text(data.date);
+    tr.append(td)
+    td = $("<td></td>");
+    td.text(data.count);
+    tr.append(td);
+    td = $("<td bProgress='false'></td>");
+    if (data.status == "completed"){
+        td.append(jQuery('<font color="green">完成</font>'));
+    }else if (data.status == "wait"){
+        td.append(jQuery('<font color="red">正在初始化任务</font>'));
+        var t = setInterval(function(){
+            $.ajax({
+                     type: "post",
+                     url: "{{=URL('getSyncProgress')}}",
+                     data: {"logId":data.id},
+                     dataType: "json",
+                     success: function(data){
+                         //alert("create sync table: "+data.data.status);
+                         if(data.data.status == "run"){
+                             p = parseInt(data.data.up_count/data.data.count * 100);
+                             if (td.attr("bProgress")=="false"){
+                                 td.prev().text(data.data.count);
+                                 td.children().remove();
+                                 td.attr("bProgress","true");
+                                 td.append(jQuery('<div id="downProgress" class="progress-bar progress-bar-success" ></div>'));
+                             }
+                             pg = td.children(".progress-bar");
+                             pg.text(p+"%");
+                             pg.attr("style", "width: "+p+"%");
+                         }else if (data.data.status == "completed"){
+                             clearInterval(t);
+                             td.prev().text(data.data.count);
+                             td.children().remove();
+                             td.append(jQuery('<font color="green">完成</font>'));
+                         }
+                     }
+            });
+        }, 2000);
+        timer.push(t);
+    }else if (data.status == "run"){
+        p = parseInt(data.up_count/data.count * 100);
+        if (td.attr("bProgress")=="false"){
+            td.prev().text(data.count);
+            td.children().remove();
+            td.attr("bProgress","true");
+            td.append(jQuery('<div id="downProgress" class="progress-bar progress-bar-success" ></div>'));
+        }
+        pg = td.children(".progress-bar");
+        pg.text(p+"%");
+        pg.attr("style", "width: "+p+"%");
+        var t = setInterval(function(){
+            $.ajax({
+                     type: "post",
+                     url: "{{=URL('getSyncProgress')}}",
+                     data: {"logId":data.id},
+                     dataType: "json",
+                     success: function(data){
+                         //alert("create sync table: "+data.data.status);
+                         if(data.data.status == "run"){
+                             p = parseInt(data.data.up_count/data.data.count * 100);
+                             if (td.attr("bProgress")=="false"){
+                                 td.prev().text(data.data.count);
+                                 td.children().remove();
+                                 td.attr("bProgress","true");
+                                 td.append(jQuery('<div id="downProgress" class="progress-bar progress-bar-success" ></div>'));
+                             }
+                             pg = td.children(".progress-bar");
+                             pg.text(p+"%");
+                             pg.attr("style", "width: "+p+"%");
+                         }else if (data.data.status == "completed"){
+                             clearInterval(t);
+                             td.prev().text(data.data.count);
+                             td.children().remove();
+                             td.append(jQuery('<font color="green">完成</font>'));
+                         }
+                     }
+            });
+        }, 2000);
+        timer.push(t);
+    }
+    tr.append(td);
+    return tr;
+}
+
+function clearTimer(timer){
+    //alert("timer.length: "+timer.length);
+    for(var i=0; i<timer.length; i++){
+         clearInterval(timer.pop());
+    }
+}
+{{end}}

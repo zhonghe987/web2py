@@ -1,0 +1,21 @@
+# -*- coding: utf-8 -*-
+
+def getStatusButton(status):
+    if status == 'run':
+        s = '暂停'
+    elif status == 'stop':
+        s = '启动'
+    else:
+        s = ''
+    return s
+
+def getStatus(status):
+    if status=='run':    
+        s='正常'
+    elif status=='stop':    
+        s='暂停' 
+    else: 
+        s=''
+    return s
+
+

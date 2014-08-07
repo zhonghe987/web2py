@@ -1,0 +1,153 @@
+{{ from AppFunc import getTaskStatus }}
+
+{{header = True}}
+{{sidebar = True}}
+{{bread = False}}
+
+{{extend 'layout.html'}}
+
+{{block content}}
+<div class="panel-body">                           
+    <table class="table">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>任务名称</th>
+                <th>状态</th>
+                <th>开始时间</th>
+                <th>结束时间</th>
+                <!--<th>行为</th>-->
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="tblSchedule">   
+            <tr align="center">
+                <td>1</td>
+                <td>标签处理</td>
+                {{if task:}}
+                <td>{{=getTaskStatus(task.status)}}</td>
+                <td>{{=task.start_time}}</td>
+                <td>{{=task.last_run_time}}</td>
+                {{else:}}
+                <td>--</td>
+                <td>--</td>
+                <td>--</td>
+                {{pass}}
+                <!--<td></td>-->
+                <td id="act">
+                    {{if (task and (task.status == "COMPLETED" or task.status=="FAILED")) or not task:}}
+                    <a onclick="taskAction('start',0, timer)" href="#">启动</a>
+                    {{else:}}
+                    <a onclick="taskAction('stop',{{=task.id}}, timer)" href="#">暂停</a>
+                    {{pass}}
+                </td>
+            </tr>
+        </tbody>
+     </table>
+  </div>     
+{{end}}
+
+{{block script}}
+timer = Array()
+$(window).on("beforeunload", function(){
+    clearTimer(timer);
+});
+
+{{if status != "COMPLETED" and status != "FAILED":}}
+t = setInterval(function(){getTaskInfo({{=taskId}}, timer)}, 5000);
+timer.push(t);
+{{pass}}
+{{end}}
+
+{{block script func}}
+function taskAction(act, taskId, timer){
+    //alert("update ds ->"+act);
+    tbl = jQuery("#tblSchedule tr").children();
+    jQuery(tbl[2]).text("正在提交任务");
+    $.ajax({
+        type: "post",
+        url: "{{=URL('taskAction')}}",
+        data: {"act":act, "taskId":taskId},
+        dataType: "json",
+        success: function(data){
+            td = jQuery("#act");
+            td.children().remove();
+            a = jQuery('<a href="#"></a>');
+            a.text(data.des);
+            a.click(function(){taskAction(data.act,data.taskId, timer)});
+            td.append(a);
+            if(act=="start"){
+                t = setInterval(function(){getTaskInfo(data.taskId, timer)}, 5000);
+                timer.push(t);
+            }else{
+                clearTimer(timer);
+            }
+        }
+    });
+}
+
+function getTaskInfo(taskId, timer){
+    $.ajax({
+        type:"post",
+        url:"{{=URL('taskInfo')}}",
+        data:{"taskId":taskId},
+        dataType: "json",
+        success: function(data){            
+            tbl = jQuery("#tblSchedule tr").children();
+            jQuery(tbl[2]).text(getTaskStatus(data.task.status));
+            jQuery(tbl[3]).text(data.task.start_time);
+            jQuery(tbl[4]).text(data.task.last_run_time);
+            td = jQuery(tbl[6]);
+            //alert(data.task.status+"--"+td.children("a").text());
+            if ((data.task.status=="COMPLETED" ||data.task.status=="FAILED")&& td.children("a").text() == "暂停"){
+                clearTimer(timer);
+                td.children().remove();
+                a = jQuery('<a href="#"></a>');
+                a.text("启动");
+                a.click(function(){taskAction("start",0, timer)});
+                td.append(a);
+            }
+        }
+    });
+}
+
+function clearTimer(timer){
+    //alert("timer.length: "+timer.length);
+    c = timer.length;
+    for(var i=0; i<c; i++){
+         clearInterval(timer.pop());
+    }
+}
+
+function getTaskStatus(status){
+    //alert(status);
+    switch(status)
+   {
+        case 'QUEUED':
+            s = '在队列中等待';
+            break;
+        case 'ASSIGNED':
+            s = '分配中';
+            break;
+        case 'EXPIRED':
+            s = '过期';
+            break;
+        case 'RUNNING':
+            s = '正在运行';
+            break;
+        case 'TIMEOUT':
+            s = '运行超时';
+            break;
+        case 'FAILED':
+            s = '运行失败';
+            break;
+        case 'COMPLETED':
+            s = '运行完成';
+            break;
+        default:
+            s = '';
+            break;
+    }
+    return s
+}
+{{end}}

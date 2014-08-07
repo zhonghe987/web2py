@@ -1,0 +1,129 @@
+{{extend 'data_index.html'}}
+
+{{block index}}
+<section class="main-content-wrapper">
+            <section id="main-content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--breadcrumbs start -->
+                        <ul class="breadcrumb">
+                            <li>数据源管理</li>
+                        </ul>
+                        <!--breadcrumbs end -->
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title"></h3>
+                            </div>
+                            <div class="panel-body">
+                            <div class="table-control">
+                            <div class="bq">
+                           <!--
+                            <table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+                              <tr>
+                                <td width="100" align="right">数据源名称：</td>
+                                <td width="160" align="left"><input type="text"  class="form-control form-input"></td>
+                                <td width="100" align="right">Cookie域名：</td>
+                                <td width="160" align="left"><input type="text"  class="form-control form-input"></td>
+                                <td width="50" align="right">状态：</td>
+                                <td width="160" align="left"><select  class="form-control input-sm form-input">
+                                        <option value="">全部</option>
+                                        <option value="">正常</option>
+                                        <option value="">暂停</option>
+                                    </select></td>
+                                <td width="120" align="center"><button  type="button" class="btn btn-default">查找</button></td>
+                              </tr>
+                            </table> -->
+                            {{=form.custom.begin}}
+                            <table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+                              <tr>
+                                <td width="100" align="right">数据源名称：</td>
+                                <td width="160" align="left">{{=form.custom.widget.dataSname}}</td>
+                                <td width="100" align="right">Cookie域名：</td>
+                                <td width="160" align="left">{{=form.custom.widget.cookiedom}}</td>
+                                <td width="50" align="right">状态：</td>
+                                <td width="160" align="left">{{=form.custom.widget.source}}</td>
+                                <td width="120" align="center">{{=form.custom.submit}}</td>
+                              </tr>
+                            </table>
+                            {{=form.custom.end}}
+                            </div>
+                            </div>
+                            </div>
+                            <div class="panel-body1">
+                            <div class="delete-all">
+                            <button type="button"  class="btn btn-default">批量冻结</button>
+                            </div>
+                            <div class="add-user">
+							<a type="button" href="{{=URL('dataSource','new')}}  "class="btn btn-primary">新增数据源</a>
+                            </div>
+                            </div>
+                            <div class="panel-body">                           
+                            <table class="table">
+                                    <thead>
+                                <tr>
+                                <th><input type="checkbox" id="checkall" name="checkall" ></th>
+                                <th>编号</th>
+                                <th>数据源名称</th>
+                                <th>Cookie域</th>
+                                <th>创建时间</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody >
+                                   {{for da in data:}}
+	                                  <tr align="center">
+                                      <td><input type="checkbox" name='box'></td>
+                                      <td  id="num_order">{{=da.d_id}}</td>
+                                      <td>{{=da.dsName}}</td>
+                                      <td>{{=da.cookieDomain}}</td>
+                                      <td>{{=da.date}}</td>
+                                      <td>{{=da.dsStatus}}</td>
+                                      <td><a href='{{=URL("show",vars=dict(sh_id=da.d_id))}}'>查看</a>&nbsp;&nbsp;<a href="{{=URL('change',vars=dict(st_id=da.d_id,status=da.dsStatus))}}"  id='data_stop'>暂停&nbsp;&nbsp;</a><a href="{{=URL('dele',vars=dict(de_id=da.d_id))}}">删除</a></td>
+                                      </tr> 
+                                      {{pass}}
+                                  
+                                    </tbody>
+                                </table>
+                     <div class="mpage">
+                     <div class="col-xs-6">
+                    <div class="dataTables_info">一共 234 条用户信息</div>
+                    </div>
+                    <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ul class="pagination">
+                    <li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>
+                    <li class="paginate_button active" aria-controls="example" tabindex="0"><a href="#">1</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">2</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">3</a></li><li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">4</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">5</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">6</a></li>
+                    <li class="paginate_button next" aria-controls="example" tabindex="0" id="example_next"><a href="#">Next</a></li>
+                    </ul>
+                    </div>
+                    </div>
+                            </div>
+                             </div>
+                        </div>
+                    </div>  
+                    </div>
+
+
+            </section>
+        </section>
+        <!--main content end-->       
+    </section>
+
+
+{{end}}
+
+
+
+
+
+
+

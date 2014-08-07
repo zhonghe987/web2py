@@ -1,0 +1,55 @@
+﻿# -*- coding: utf-8 -*-
+
+def __getKeyNames(data):
+    keyNames = []
+    for i in range(1,4):
+        k = 'keyname%d' %i
+        n = data[k]
+        if n:
+            keyNames.append('%s:%s' %(n,data['%s_value' %k]))
+    return ','.join(keyNames)
+
+def index():
+    options = [OPTION('全部',_value='all',_selected=True),OPTION('正常',_value='run'),OPTION('暂停',_value='stop')]
+    form = FORM('数据源名称', INPUT(_name='name'),
+                'Cookie域名:', INPUT(_name='domain'),
+                '状态:', SELECT(*options,_name='status',requires=IS_IN_SET(['all','run', 'stop'])),   
+                INPUT(_type='submit',_value='搜索'))
+    #data = lda_db((lda_db.dataSource.dsName == request.vars.name) & (lda_db.dataSource.cookieDomain == request.vars.domain)).select(lda_db.dataSource.d_id,lda_db.dataSource.dsName,lda_db.dataSource.cookieDomain,lda_db.dataSource.dsStatus)
+    data = lda_db((lda_db.dataSource.dsName == request.vars.name) & (lda_db.dataSource.cookieDomain == request.vars.domain)).select(lda_db.dataSource.ALL)
+    print data 
+    return dict(form=form,data = data)
+
+
+def new():
+    form = FORM('数据源名称:', INPUT(_name='name', requires=IS_NOT_EMPTY()),
+                'Cookie域名:', INPUT(_name='domain', requires=IS_NOT_EMPTY()),
+                'KeyName1:', INPUT(_name='keyname1', requires=IS_NOT_EMPTY()),
+                '值长度:', INPUT(_name='keyname1_value', requires=IS_NOT_EMPTY()),
+                'KeyName2:', INPUT(_name='keyname2'),
+                '值长度:', INPUT(_name='keyname2_value'),
+                'KeyName3:', INPUT(_name='keyname3'),
+                '值长度:', INPUT(_name='keyname3_value'),   
+                INPUT(_type='submit',_value='保存'),
+                INPUT(_type='button', _value='取消'))
+    if form.accepts(request, session):
+        keyNames = __getKeyNames(form.vars)
+        r = lda_db.dataSource.insert(account_id=session.user.id, 
+                                                                dsName=form.vars.name,
+                                                                cookieDomain=form.vars.domain,
+                                                                keyNames=keyNames)
+        lda_db.executesql('CREATE TABLE DS_%s (ds_id int, cookieId varchar(45), lastDate datetime, primary key (ds_id)) engine=MyISAM DEFAULT CHARSET=utf8' %r)
+        lda_db.define_table('DS_%s' %r,
+                                                 Field('ds_id','id'),
+                                                 Field('cookieId'),
+                                                 Field('lastDate', 'datetime'))
+        response.flash = 'add dataSource id-> %s' %lda_db 
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form-> %s' %session.user
+
+    return dict(form=form)
+
+def show():
+    return dict()

@@ -1,0 +1,5 @@
+{{
+    from gluon.serializers import json
+    response.write(json(response._vars), escape=False)
+    response.headers['Content-Type'] = 'text/json'
+}}

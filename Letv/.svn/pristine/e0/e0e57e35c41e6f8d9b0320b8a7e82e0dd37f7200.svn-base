@@ -1,0 +1,164 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+.block-margin{
+    margin:5px 5px 5px 5px;
+}
+</style>
+{{end}}
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <form class='o' action="tagEdit" method="POST">
+                <div class="panel-body bt-border">
+                    <div class="form-title">标签信息</div>
+                    <table width="400" border="0" cellspacing="0" cellpadding="0">
+                        <tr> 
+                            <td align="right" width="155">标签名称：</td>
+                            <td width="245"><input name="tagname" type="text" class="form-control"></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">所属大类别：</td>
+                            <td width="245">{{=bigClass}}</td>
+                            <td width="245"><a class="block-margin" href="{{=URL('tagClassManage', 'edit')}}">新建大类别</a></td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">所属小类别：</td>
+                            <td width="245">{{=midClass}}</td>
+                            <td width="245"><a class="block-margin" href="{{=URL('tagClassManage', 'edit')}}">新建小类别</a></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="panel-body bt-border">
+                    <div class="form-title">触发规则</div>
+                        <div class="s">规则：<input type="button" value = "创建规则组"id="creatGroup"></div>
+                        <div  id = "fm"  class="form-horizontal" role="form"> </div>
+                        <div class="form-group"></div>
+                 </div>                    
+                 <div class="col-md-12" align="center">
+                       <button type="submit" class="btn btn-primary" style="margin-top:5px" data-toggle="modal" data-target="#basicModal">保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+                       <button id="cancel" class="btn" style="margin-top:5px">取消</button>
+                </div>
+            </form> 
+        </div>
+    </div> 
+</div>                                
+{{end}}
+{{block  script}}
+bigClass = jQuery('{{=bigClass}}');
+midClass = jQuery('{{=midClass}}');
+
+jQuery('#no_table_mid_name').attr('class','form-control');
+jQuery('#no_table_log_mark').attr('class','form-control');
+jQuery('#no_table_big_name option:first').remove();
+jQuery('#no_table_big_name').attr('class','form-control input-sm');
+jQuery('#subt').attr('class','btn btn-primary');
+jQuery("#cancel").click(function(e){
+    e.preventDefault()
+    window.location = "{{=URL('tagManage')}}";
+});
+$("#fm div").attr("align","center");
+$('#creatGroup').click(function(){ 
+    var _len = $("#fm div").length; 
+    $("#fm").append("<div class='panel-body bt-border' id= 'div"+_len+"'><ul>规则组"+(_len+1)+"</ul> <table id= 'tab"+_len+"' value = '规则'>"
+                                 +"<tr align='center' id=0>"
+                                 +'<td width="10%" id="strsdiv'+_len+'">{{=all}}</td>'
+                                 +"<td width='10%' ><select name='baodiv"+_len+"'><option value='containOr'>包含</option><option value='notContainAnd'>不包含</option></select></td>"
+                                 +"<td width='30%'><input  type='text' name='filldiv"+_len+"' id='fill' class='form-control'/></td>"
+                                 +"<td width='20%'><a href=\"#\" onclick = \'addTable(\"div"+_len+"\",\"tab"+_len+"\")\' >添加</a>&nbsp;&nbsp;<a href=\'#\' onclick=\'deletTable(\"div"+_len+"\",\"tab"+_len+"\",0)\'>删除</a></td>"
+                                 +"</tr>"
+                                 +"</table>"
+                                 +"</div>");
+ });
+
+
+$('#creatGroup').click(function(){ 
+var count = $('#fm  div').length;
+for(var i=0;i<count;i++){
+    var name = 'div'+i;
+    $('td[id="strsdiv'+i+'"] select').attr('name',"strsdiv"+i);
+}
+});
+
+jQuery("#big").change(function(){
+    //alert("change");
+    bcId = $(this).find('option:selected').val();
+    md = jQuery("#mid");
+    md.children().remove();
+    opt = midClass.children().clone();
+
+    if (bcId=="0"){
+        //alert('all');        
+        md.append(opt);
+    }else{
+        opt = midClass.children().clone();
+        //alert($(opt[1]).attr("bcId"));
+        for (var i=1; i<opt.length; i++){
+            cur = $(opt[i])
+            if (cur.attr("bcId") == bcId){
+                md.append(cur);
+            }
+        }
+        md.append($(opt[0]));
+    }
+});
+
+jQuery("#mid").change(function(){
+    //alert("change");
+    value = $(this).find('option:selected').val();
+    big = jQuery("#big");
+    big.children().remove();
+    opt = bigClass.children().clone();
+    if (value=="0"){
+        //alert('all');        
+        big.append(opt);
+    }else{
+        bcId = $(this).find('option:selected').attr("bcId");
+        //alert($(opt[1]).attr("bcId"));
+        for (var i=1; i<opt.length; i++){
+            cur = $(opt[i])
+            if (cur.val() == bcId){
+                big.append(cur);
+                break;
+            }
+        }
+        big.append($(opt[0]));
+    }
+})
+{{end}}
+
+
+{{block script func}}
+
+function addTable(div,tab){
+    var _len = $("#"+tab+" tr").length;
+    $("#"+tab+"").append("<tr align='center' id="+_len+">"
+                                        +'<td width="10%" id="strs'+div+'">{{=all}}</td>'
+                                        +"<td width='10%'><select name='bao"+div+"' ><option value='containOr'>包含</option><option value='notContainAnd'>不包含</option></select></select></td>"
+                                        +"<td width='30%'><input  type='text' name='fill"+div+"' id='fill' class='form-control'/></td>"
+                                        +"<td width='20%'><a href=\"#\" onclick = \'addTable(\""+div+"\",\""+tab+"\")\' >添加</a>&nbsp;&nbsp;<a href=\'#\' onclick=\'deletTable(\""+div+"\",\""+tab+"\","+_len+")\'>删除</a></td>"
+                                        +"</tr>");
+    $('td[id="strs'+div+'"] select').attr('name',"strs"+div);
+}
+
+function deletTable(div,tab,index){
+    var _len = $("#"+tab+" tr").length;
+    if(index == 0 & _len == 1){
+        $("#"+tab+" tr[id="+index+"]").remove();
+        $("#"+tab+"").remove();
+        $("#"+div+"").remove();
+    }else if(_len == 1){
+        $("#"+tab+" tr[id="+index+"]").remove();
+        $("#"+tab+"").remove();
+        $("#"+div+"").remove();
+    }else{
+        $("#"+tab+" tr[id="+index+"]").remove();
+    } 
+}
+
+{{end}}

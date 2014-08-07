@@ -1,0 +1,34 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = False}}
+
+{{extend 'layout.html'}}
+{{block head}}
+
+{{end}}
+{{block content}}
+<div>
+	<div>
+		<h2>标签管理</h2>
+		<p>------------------------</p>
+		<p>已创建{{=tag_num}}个标签</p>
+	</div>
+	<br/>
+	<div>
+		<h2>标签类管理</h2>
+		<p>-------------------------</p>
+		<p>以创建{{=tag_class}}个类别</p>
+	</div>
+	
+	<br/>
+	<div>
+		<h2>系统历史</h2>
+		<p>-------------------------</p>
+		
+	</div>
+	
+</div>
+
+   
+      
+{{end}}

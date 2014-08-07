@@ -1,0 +1,93 @@
+{{header_enabled=False}}
+{{sidebar_enabled=False}}
+
+{{ extend "layout.html"}}
+
+{{block container}}
+<style>
+div.error{
+	color:red;
+}
+</style>
+<section id="login-container">
+    <div class="row">
+        <div class="col-md-3" id="login-wrapper">
+            <div class="panel panel-primary animated flipInY">
+                <div class="panel-heading">
+                    <h3 class="panel-title">注册</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal" role="form">
+                    {{=form.custom.begin}}
+                        <div class="form-group">
+                            <div class='error'></div>
+                            <div class="col-md-12">
+                                {{=form.custom.widget.username}}
+                                <i class="fa fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class='error'></div>
+                            <div class="col-md-12">
+                                {{=form.custom.widget.email}}
+                                <i class="fa fa-user"></i>
+                            </div>
+                            <div class="col-md-12">
+                                {{=form.custom.widget.company}}
+                                <i class="fa fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                {{=form.custom.widget.password}}
+                                <i class="fa fa-lock"></i>
+                            </div>
+                            <div class="col-md-12">
+                                {{=form.custom.widget.password_two}}
+                                <i class="fa fa-lock"></i>
+                            </div>
+                            <div class="col-md-12" style="margin:5px 10px">
+                                <a href={{=URL('login')}}  >登录</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                            {{=form.custom.submit}}
+                            </div>
+                        </div>
+                        {{=form.custom.widget.first_name}}
+                        {{=form.custom.widget.last_name}}
+                    {{=form.custom.end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}
+
+{{block script}}
+jQuery("[type='submit']").attr("value","注册").addClass("btn-primary btn-block");
+jQuery('#auth_user_username').addClass('form-control');
+jQuery('#auth_user_username').attr('placeholder','用户名');
+jQuery('#auth_user_username').attr('style','padding-left:30px');
+jQuery('#auth_user_email').addClass('form-control');
+jQuery('#auth_user_email').attr('placeholder','电子邮件');
+jQuery('#auth_user_email').attr('style','padding-left:30px');
+jQuery('#auth_user_company').addClass('form-control');
+jQuery('#auth_user_company').attr('placeholder','公司名称');
+jQuery('#auth_user_company').attr('style','padding-left:30px;margin-top:5px');
+jQuery('#auth_user_password').addClass('form-control');
+jQuery('#auth_user_password').attr('placeholder','密码');
+jQuery('#auth_user_password').attr('style','padding-left:30px');
+jQuery("[name='password_two']").addClass('form-control');
+jQuery("[name='password_two']").attr('placeholder','确认密码');
+jQuery("[name='password_two']").attr('style','padding-left:30px;margin-top:5px');
+
+jQuery("#auth_user_first_name").addClass("hide");
+jQuery("#auth_user_first_name").attr("value", "null");
+jQuery("#auth_user_last_name").addClass("hide");
+jQuery("#auth_user_last_name").attr("value", "null");
+{{end}}
+
+

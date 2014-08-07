@@ -1,0 +1,57 @@
+﻿{{ extend 'layout.html'}}
+
+{{block head}}
+<style>
+body{background:#f0f0f0;}
+a{color:#666;}
+a:hover{color:#669900;}
+.loginmain{width:100%; background:url({{=URL('static','images/loginmain_bg.png')}}) center center no-repeat; min-height:560px;position:relative; top:7%;  z-index:90}
+.logininner{max-width:1200px;margin:0 auto; height:100%}
+.logo{position: absolute; top:50px; left:15%;}
+.login{width:390px; margin:0 auto; top:140px;position: relative; }
+.login h1{font-size:18px; font-weight:bold; width:100%; float:left; line-height:40px; color:#999}
+.loginform{width:100%; float:left; margin-top:20px;}
+.username{width:100%; float:left;}
+.userpd{width:100%; float:left;margin-top:15px;}
+.remuser{width:100%; float:left;margin-top:5px;}
+.user_left{width:70px; float:left; text-align:right; font-size:14px; line-height:30px;}
+.user_input{float:left;}
+.user_input input{background:url({{=URL('static','images/user.png')}})  left no-repeat #fff; box-shadow:inset 0 0 5px #eee; height:22px; width:220px; padding-left:25px;}
+.userpd_input input{background:url({{=URL('static','images/lock.png')}}) left no-repeat #fff; box-shadow:inset 0 0 5px #eee; height:22px; width:220px; padding-left:25px;}
+.remcheck{ float:left; margin:0 0 0 70px; width:250px;}
+.remcheck input{position:relative; top:-3px; top:0\9;}
+.login-btn span{float:right; line-height:34px;}
+.user_rem{float:left; color:#f00;}
+.login-btn{float:left; margin:20px 0 0 70px; width:250px;margin:20px 0 0 70px\9;}
+.login-btn button{font-size:16px; font-weight:bold;}
+.loginbtn{padding:3px 40px !important;}
+.copyright{text-align:center;height:40px; width:100%;position: fixed; z-index:9999; bottom:0;}
+</style>
+{{end}}
+
+<div class="loginmain">
+<div class="logininner">
+<div class="login">
+{{=form.custom.begin}}
+<h1>用户登录</h1>
+<div class="loginform">
+<div class="username">
+<div class="user_left">用户名：</div>
+<div class="user_input">{{=form.custom.widget.user}}</div>
+</div>
+<div class="userpd">
+<div class="user_left">密码：</div>
+<div class="userpd_input">{{=form.custom.widget.pwd}}</div>
+</div>
+<div class="remuser">
+<div class="user_left">&nbsp;</div>
+<div class="user_rem">用户名或密码输入不正确！</div>
+</div>
+<div class="remcheck"><input type="checkbox">&nbsp;记住用户名和密码</div>
+<div class="login-btn"><span><a href="#">忘记密码？</a></span>{{=form.custom.submit}}</div>
+{{=form.custom.end}}
+</div>
+</div>
+</div>
+</div>
+

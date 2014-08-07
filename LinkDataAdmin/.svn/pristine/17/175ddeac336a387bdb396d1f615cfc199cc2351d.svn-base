@@ -1,0 +1,139 @@
+﻿# -*- coding: utf-8 -*-
+
+def __getKeyNames(data):
+    keyNames = []
+    for i in range(1,4):
+        k = 'keyname%d' %i
+        n = data[k]
+        if n:
+            keyNames.append('%s:%s' %(n,data['%s_value' %k]))
+    return ','.join(keyNames)
+
+def index():
+    s = [('all','全部'),('run','运行'),('stop','暂停')]
+    btn = INPUT(_value='搜索',_type='submit',_id='sub')
+    form = SQLFORM.factory(Field('dataSname', requires=IS_NOT_EMPTY()),
+                           Field('cookiedom',requires = IS_NOT_EMPTY()),
+                           Field('source',requires=IS_IN_SET(s)),
+                           buttons = [btn]
+                          )
+    
+    data = lda_db(lda_db.dataSource.dsStatus != 'delete').select()
+    if not request.vars.dataSname and  not request.vars.cookiedom:
+        return dict(form = form ,data = data)
+    else:
+        if request.vars.source == "all" and request.vars.dataSname and request.vars.cookiedom:
+            data = lda_db((lda_db.dataSource.dsStatus != 'delete') & (lda_db.dataSource.dsName == request.vars.dataSname) & (lda_db.dataSource.cookieDomain == request.vars.cookiedom )).select()
+            return dict(form = form, data = data )
+        elif  request.vars.source == "run" and request.vars.dataSname and request.vars.cookiedom:
+            data = lda_db((lda_db.dataSource.dsStatus != 'delete') & (lda_db.dataSource.dsName == request.vars.dataSname) & (lda_db.dataSource.cookieDomain == request.vars.cookiedom) & (lda_db.dataSource.dsStatus == request.vars.source) ).select()
+            return dict(form = form, data = data )
+        elif request.vars.source == "stop" and request.vars.dataSname and request.vars.cookiedom:
+            data = lda_db((lda_db.dataSource.dsStatus != 'delete') & (lda_db.dataSource.dsName == request.vars.dataSname) & (lda_db.dataSource.cookieDomain == request.vars.cookiedom) & (lda_db.dataSource.dsStatus == request.vars.source) ).select()
+            return dict(form = form, data = data )       
+    return dict(form = form ,data = data)
+    
+    
+     
+ 
+   
+def filterData():
+    '''
+    if request.vars.status == "全部":
+        datas = lda_db((lda_db.dataSource.dsName == request.vars.dataSourName) & (lda_db.dataSource.dsName == request.vars.cookieDomain)).select(lda_db.dataSource.ALL)
+        return dict(data = datas)
+    else:
+        datas = lda_db((lda_db.dataSource.dsName == request.vars.dataSourName) & (lda_db.dataSource.dsName == request.vars.cookieDomain) & (lda_db.dataSource.dsStatus == request.vars.status)).select(lda_db.dataSource.ALL)
+        return dict(data = datas)
+    '''
+    s = [('all','全部'),('run','运行'),('stop','暂停')]
+    btn = INPUT(_value='搜索',_type='submit',_id='sub')
+    form = SQLFORM.factory(Field('dataSname', requires=IS_NOT_EMPTY()),
+                           Field('cookiedom',requires = IS_NOT_EMPTY()).
+                           Field('source',requires=IS_IN_SET(s)),
+                           buttons = [btn]
+                          )
+    return  dict(forms = form)
+
+
+
+    
+    
+
+
+
+def new():
+    form = FORM('数据源名称:', INPUT(_name='name', requires=IS_NOT_EMPTY()),
+                'Cookie域名:', INPUT(_name='domain', requires=IS_NOT_EMPTY()),
+                'KeyName1:', INPUT(_name='keyname1', requires=IS_NOT_EMPTY()),
+                '值长度:', INPUT(_name='keyname1_value', requires=IS_NOT_EMPTY()),
+                'KeyName2:', INPUT(_name='keyname2'),
+                '值长度:', INPUT(_name='keyname2_value'),
+                'KeyName3:', INPUT(_name='keyname3'),
+                '值长度:', INPUT(_name='keyname3_value'),   
+                INPUT(_type='submit',_value='保存'),
+                INPUT(_type='button', _value='取消'))
+    if form.accepts(request, session):
+        keyNames = __getKeyNames(form.vars)
+        r = lda_db.dataSource.insert(account_id=session.user.id, 
+                                                                dsName=form.vars.name,
+                                                                cookieDomain=form.vars.domain,
+                                                                keyNames=keyNames)
+        tbl = 'DS_%s' %r
+        lda_db.executesql('CREATE TABLE %s (ds_id int, cookieId varchar(45), lastDate datetime, primary key (ds_id)) engine=MyISAM DEFAULT CHARSET=utf8' %tbl)
+        lda_db.define_table(tbl,
+                                                 Field('ds_id','id'),
+                                                 Field('cookieId'),
+                                                 Field('lastDate', 'datetime'))
+        lda_db.executesql("INSERT INTO %s(ds_id, cookieId) select id, cookie_data from sour_cookie where cookie_dom = '%s'" %(tbl,form.vars.domain))
+        #response.flash = 'add dataSource id-> %s' %lda_db 
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form-> %s' %session.user
+
+    return dict(form=form)
+
+
+
+def show():
+    ks=[]
+    js = []
+    #datas =   lda_db.executesql('select dsName,cookieDomain,keyNames from dataSource where d_id = %s'%(request.vars.sh_id))
+    datas = lda_db(lda_db.dataSource.d_id == request.vars.sh_id).select(lda_db.dataSource.dsName,lda_db.dataSource.cookieDomain,lda_db.dataSource.keyNames)
+    for ke in datas.last()['keyNames'].split(','):
+        ks.append(ke.split(":"))
+    datas.last()['keyNames']= list(ks)
+    
+    return dict(data = datas)
+
+def  change():
+    if request.vars.st_id:
+        if request.vars.status == "stop":
+            lda_db.executesql("update dataSource set dsStatus = 'run' where d_id=%s"%(request.vars.st_id))
+        elif request.vars.status == "run":
+            lda_db.executesql("update dataSource set dsStatus = 'stop' where d_id=%s"%(request.vars.st_id))
+        else:
+            pass
+    redirect(URL('dataSource','index'))
+
+    
+def  dele():
+    if request.vars.de_id:
+        lda_db.executesql("update dataSource set dsStatus = 'delete' where d_id=%s"%(request.vars.de_id))
+    redirect(URL('dataSource','index'))
+    
+    
+def cook():
+    btn = INPUT(_value='搜索',_type='submit',_id='subm')
+    form = SQLFORM.factory(Field('firsttime', requires=IS_NOT_EMPTY()),
+                           Field('lasttime',requires = IS_NOT_EMPTY()),
+                           buttons = [btn]
+                          )
+    cookC= lda_db.executesql("select date,count(*) from dataSource group by date")
+    if request.vars.firsttime and request.vars.lasttime:
+        cookC = lda_db.executesql("select date,count(*) from dataSource where  date between '%s'  and '%s' group by date"%(request.vars.firsttime,request.vars.lasttime))
+        return dict(form=form,cook=cookC)
+    return dict(form=form,cook=cookC)
+    
+            

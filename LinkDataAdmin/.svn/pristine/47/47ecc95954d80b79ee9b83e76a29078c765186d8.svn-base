@@ -1,0 +1,137 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+<div class="panel-body bt-border">
+    <div class="form-horizontal" role="form">
+        <div class="form-title">基本信息</div>
+        {{=form.custom.begin}}                               
+        <table width="600" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td align="right" width="155">数据源名称：</td>
+                <td width="200" >{{=form.custom.widget.name}}</td>
+                <td align="left" width="200" id='su'></td>
+            </tr>
+            <tr>
+                <td align="right" width="155">Cookie域名：</td>
+                <td width="200">{{=form.custom.widget.domain}}</td>
+                <td align="left" id='co'></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="panel-body bt-border">
+    <div class="form-horizontal" role="form">
+        <div class="form-title">KeyName信息</div>
+        <table width="700" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+                <td align="right" width="155">KeyName1：</td>
+                <td width="192">{{=form.custom.widget.keyname1}}</td>
+                <td align="right" width="71">值长度：</td>
+                <td width="198">{{=form.custom.widget.keyname1_value}}</td>
+                <td width="84">&nbsp;&nbsp;字节</td>
+             </tr>
+             <tr>
+                 <td align="right" width="155">KeyName2：</td>
+                 <td>{{=form.custom.widget.keyname2}}</td>
+                 <td align="right" width="71">值长度：</td>
+                 <td>{{=form.custom.widget.keyname2_value}}</td>
+                 <td>&nbsp;&nbsp;字节</td>
+             </tr>
+             <tr>
+                 <td align="right" width="155">KeyName3：</td>
+                 <td>{{=form.custom.widget.keyname3}}</td>
+                 <td align="right" width="71">值长度：</td>
+                 <td>{{=form.custom.widget.keyname3_value}}</td>
+                 <td>&nbsp;&nbsp;字节</td>
+             </tr>
+        </table>                                    
+    </div>                                
+</div>
+
+<!-- Basic Modal -->
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div class="modal-body">
+                    <p>数据源保存后只能删除，不能编辑，是否要继续保存？</p>
+            </div>
+            <div  id="app" class="modal-footer">
+            	{{=form.custom.submit}}
+                 
+               
+           </div>
+        </div>
+    </div>
+</div>
+{{=form.custom.end}}
+<div class="col-md-12" align="center">
+	<button type="button" id="new_button" class="btn btn-primary" data-toggle="modal" data-target="#basicModal">保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="submit" id= "go" class="btn" >取消 </button>
+</div>
+{{end}}
+
+{{block script}}
+jQuery("#no_table_name").attr('class','form-control');
+jQuery("#no_table_name").attr('onBlur','valite_data({{=auth.user.id}});');
+jQuery("#no_table_domain").attr('class','form-control');
+jQuery("#no_table_keyname1").attr('class','form-control');
+jQuery("#no_table_keyname2").attr('class','form-control');
+jQuery("#no_table_keyname3").attr('class','form-control');
+jQuery("#no_table_keyname1_value").attr('class','form-control');
+jQuery("#no_table_keyname2_value").attr('class','form-control');
+jQuery("#no_table_keyname3_value").attr('class','form-control');
+jQuery("#subt").attr('class','btn btn-primary');
+jQuery("#side_ds").attr("id","now-nav");
+
+jQuery('#app div').append(' <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+
+jQuery('#new_button').click(function(){
+    var hn=jQuery('#no_table_name').val();
+    var dm=jQuery('#no_table_domain').val();
+    if(hn==""){
+    	jQuery('#su').html('&nbsp;&nbsp;&nbsp;&nbsp;请填写数据源名!');
+    	return false;
+    }else{
+    	var ts = jQuery('#su').text();
+    	jQuery('#su').html(ts);
+    }
+    if(dm == ''){
+    	jQuery('#co').html('&nbsp;&nbsp;&nbsp;&nbsp;请填写域名!');
+    	//jQuery('#su').html('&nbsp;&nbsp;&nbsp;&nbsp;请填写数据源名!');
+    	return false;
+    }    
+});
+
+
+
+jQuery("#go").attr("onclick","location='{{=URL('index')}}'");
+
+{{end}}
+{{block script func}}
+function  valite_data(account_id){
+	var dataName = $('#no_table_name').val();
+	if (dataName !=''){
+		$.ajax({
+		type:"POST",
+		url:"{{=URL('dataSource','valit_unique')}}",
+		data:{"acc_id":account_id,"dataname":dataName},
+		success:function(data){
+			if(data == 0){
+				$('#su').html('&nbsp;&nbsp;&nbsp;&nbsp;可以添加!');
+			}else{
+				$('#su').html('&nbsp;&nbsp;&nbsp;&nbsp;数据源已添加，请更换!');
+			}
+		}
+		
+	});}
+	
+}
+{{end}}

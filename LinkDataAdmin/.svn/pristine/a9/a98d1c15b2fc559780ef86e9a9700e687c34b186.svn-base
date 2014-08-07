@@ -1,0 +1,95 @@
+<!--{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+数据源信息
+基本信息
+数据源名称：
+Cookie域:
+
+KeyName信息
+keyName1:
+值长度：字节
+keyName2:
+值长度：字节
+keyName3:
+值长度：字节
+<button type="button" onclick="location.href='{{=URL('index')}}'">返回</button>
+-->
+{{extend 'data_index.html'}}
+{{block show}}
+
+        
+      
+                                        
+                                        <div class="tab-pane active" id="profile1">
+                                          <div class="panel-body">
+                            <div class="table-control">
+                            <div class="bq">
+                           	{{=form.custom.begin}}
+                            <table width="640" border="0" cellspacing="0" cellpadding="0">
+                              <tr>
+                                <td width="70" align="right">时间范围：</td>
+                                <td width="140" align="left">{{=form.custom.widget.firsttime}}</td>
+                                <td align="center" width="10">至&nbsp;&nbsp;&nbsp;</td>
+                                <td width="150">{{=form.custom.widget.lasttime}}</td>
+                                <td width="120">{{=form.custom.submit}}</td>
+                              </tr>
+                            </table>
+                            {{=form.custom.end}}
+                            </div>
+                            </div>
+                            </div>
+                                                        <div class="panel-body">                           
+                            <table class="table">
+                                    <thead>
+                                <tr align="left">
+                                <th>时间</th>
+                                <th>活跃cookie数（个）</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    	{{for ks in cook:}}
+                                      <tr align="left">
+                                          <td>{{=ks[0]}}</td>
+                                          <td>{{=ks[1]}}</td>
+                                        </tr> 
+                                       {{pass}}
+                                    </tbody>
+                                </table> 	
+                              
+                           
+                    <div class="mpage">
+                    <div class="col-xs-6">
+                    <div class="dataTables_info">一共 234 条用户信息</div>
+                    </div>
+                    <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ul class="pagination">
+                    <li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>
+                    <li class="paginate_button active" aria-controls="example" tabindex="0"><a href="#">1</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">2</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">3</a></li><li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">4</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">5</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">6</a></li>
+                    <li class="paginate_button next" aria-controls="example" tabindex="0" id="example_next"><a href="#">Next</a></li>
+                    </ul>
+                    </div>
+                    </div>
+                            </div>
+                                        </div>
+                                    </div>
+                                  
+                                                    <div class="col-md-12" align="center">
+                     <a  href="{{=URL('dataSource','index')}}">  <button   class="btn">返回</button></a>
+                    </div>
+                            </div>
+                        </div>
+                    </div>                     
+                    </div>
+            </section>
+        </section>
+        <!--main content end-->       
+        
+
+
+{{end}}

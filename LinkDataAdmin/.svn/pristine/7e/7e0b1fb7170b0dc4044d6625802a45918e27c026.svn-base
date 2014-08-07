@@ -1,0 +1,146 @@
+{{ from AppFunc import getStatus, getStatusButton}}
+
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+<style>
+#shw{
+	color:red;
+}
+#d{
+	position: relative;
+	line-height: 50px;
+	left:110px;
+	color:red;
+}
+</style>
+<div class="panel-body">
+    <div class="table-control">
+        <div class="bq">
+        {{=form.custom.begin}}
+        <table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+        	<th >
+        		<td hight="10" align="left" id="shw"></td>
+        		<td height="10" width="100" id ="d" align="left"></td>
+        	</th>
+            <tr>
+                 <td width="100" align="right">数据源名称：</td>
+                 <td width="160" id="names" align="left">{{=form.custom.widget.dataSname}}</td>
+                 <td width="100" align="right">Cookie域名：</td>
+                 <td width="160" id="domains" align="left">{{=form.custom.widget.cookiedom}}</td>
+                 <td width="50" align="right">状态：</td>
+                 <td width="160" align="left">{{=form.custom.widget.status}}</td>
+                 <td width="120" align="center">{{=form.custom.submit}}</td>
+            </tr>
+        </table>
+        {{=form.custom.end}}
+        </div>
+    </div>
+</div>
+
+<div class="panel-body1">
+    <div class="delete-all">
+        <button type="button"  class="btn btn-default">批量冻结</button>
+    </div>
+    <div class="add-user">
+        <a type="button" href="{{=URL('dataSource','new')}}  "class="btn btn-primary">新增数据源</a>
+    </div>
+</div>
+
+<div class="panel-body">                           
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="checkall" name="checkall" ></th>
+                <th>编号</th>
+                <th>数据源名称</th>
+                <th>Cookie域</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody >
+        {{for i, da in enumerate(data):}}
+            <tr align="center">
+                <td><input type="checkbox" name='box'></td>
+                <td>{{=i+1}}</td>
+                <td>{{=da.dsName}}</td>
+                <td>{{=da.cookieDomain}}</td>
+                <td>{{=da.date}}</td>
+                <td id="row_{{=i+1}}" data="{{=da.dsStatus}}">{{=getStatus(da.dsStatus)}}</td>
+                <td>
+                    <a href='{{=URL("show",vars=dict(sh_id=da.d_id))}}'>查看</a>&nbsp;&nbsp;
+                    <a href='#'  onclick=changeStatus({{=da.d_id}},{{=i+1}}) id="btn_{{=i+1}}">{{=getStatusButton(da.dsStatus)}}</a>&nbsp;&nbsp;
+                    <a href="{{=URL('dele',vars=dict(de_id=da.d_id))}}">删除</a>
+                </td>
+             </tr> 
+         {{pass}}                         
+         </tbody>
+     </table>
+  </div>
+{{end}}
+
+{{block script}}
+   jQuery('#no_table_dataSname').attr('class','form-control form-input');
+   jQuery('#no_table_cookiedom').attr('class','form-control form-input');
+   jQuery("#no_table_status option:first ").remove();
+   jQuery("#no_table_status").attr('class',' form-control input-sm form-input');             
+   jQuery('#sub').click(function(){
+	   var nam = jQuery('#no_table_dataSname').val();
+	   var dom = jQuery('#no_table_cookiedom').val();
+	   var re=/\W+/;
+	   var tf = re.test(nam);
+	   var dre=/.\..*\.?.*/g;
+	   var doms=re.test(dom);
+	   
+	   if(nam == ''){
+		  jQuery('#shw').html("请填写数据源名称");
+		  return false;
+	   }else if(!tf){ 
+	    		jQuery('#shw').html('');
+	   }else{
+	    		jQuery('#shw').html('数据源名称包含有符号');
+	    		return false;
+	    }	
+	   if(dom==''){
+		   jQuery('#d').html("请填写数据域");
+		   return false;
+	    }else if(doms){
+	    	alert(doms);
+		   	jQuery('#d').html('');
+		}else{
+		   	jQuery('#d').html('数据源不符合格式，例：tudou.com ');
+	    	return false;
+		   }
+		   	
+		
+	   });
+
+{{end}}
+
+
+{{block script func}}
+function changeStatus(ds_id, obj_id){
+    s = jQuery("#row_"+obj_id).attr("data");
+    alert(s);
+    $.ajax({
+        type: "POST",
+        url: "{{=URL('changeStatus')}}",
+        data: {'status':s,'id':ds_id},
+        dataType: "json",
+        success: function(data){//成功时执行函数
+             //alert( "回调成功！"+data.status );
+             jQuery("#row_"+obj_id).attr("data", data.status);
+             jQuery("#row_"+obj_id).text(data.stName);
+             jQuery("#btn_"+obj_id).text(data.stButton);
+        }
+    });
+}
+{{end}}
+
+
+

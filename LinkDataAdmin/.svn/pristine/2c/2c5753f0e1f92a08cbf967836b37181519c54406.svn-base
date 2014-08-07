@@ -1,0 +1,44 @@
+def orignalDataConf():
+    btn = INPUT(_value='继续保存',_type='submit',_id='subt')
+    dbEngine = [('选择数据引擎','选择数据引擎'),('MySQL','MySQL'),('MSSQL','MSSQL')]
+    #engine = SELECT(dbEngine,_class="form-control form-input",_id="db_engine",_name="db_engine")
+    form =  SQLFORM.factory(Field('confName',requires = IS_NOT_EMPTY()),
+                            Field('dbEngine',requires = IS_IN_SET(dbEngine)),
+                            Field('host',requires = IS_NOT_EMPTY()),
+                            Field('port',requires = IS_NOT_EMPTY()),
+                            Field('dbName',requires = IS_NOT_EMPTY()),
+                            Field('tableName',requires = IS_NOT_EMPTY()),
+                            buttons = [btn],
+                            )
+    if form.accepts(request,session) and request.vars.dbEngine !="选择数据引擎":
+        lda_db.orignalDataConf.insert(name=form.vars.confName,dbEngine = form.vars.dbEngine,host= form.vars.host,port = form.vars.port,dbName = form.vars.dbName,tableName = form.vars.tableName)
+        redirect(URL('orignalData','orignalIndex'))
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form-> %s' %auth.user
+    return dict(breadcrumb=['数据源配置管理','数据源配置'], panelTitle='新增源数据配置',form = form)
+
+
+def orignalIndex():
+    data = lda_db(lda_db.orignalDataConf.oid > 0).select()
+    return dict(breadcrumb=['数据源配置管理','数据源配置'], panelTitle='基本信息',data = data)
+
+def oringalEdit():
+    data = lda_db(lda_db.orignalDataConf.oid == request.vars.id).select()
+    import gluon.contrib.simplejson
+    return response.json(dict(data = data))
+
+def orignalDelete():
+    lda_db(lda_db.orignalDataConf.oid == request.vars.id).delete()
+    redirect(URL('orignalData','orignalIndex'))
+
+
+def edit():
+    lda_db(lda_db.orignalDataConf.oid == request.vars.ids).update(name=request.vars.dataName,
+                                  dbEngine = request.vars.dbEngine,
+                                  host= request.vars.ip,
+                                  port = request.vars.port,
+                                  dbName = request.vars.dbName,
+                                  tableName = request.vars.tableName)
+    redirect(URL('orignalData','orignalIndex'))

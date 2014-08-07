@@ -1,0 +1,123 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+
+{{block plane}}
+<div class="panel-body">
+    <div class="table-control">
+    {{=form.custom.begin}}
+        <table width="900" class="bq">
+            <tr>
+                <td width="100" align="right">标签项目名称：</td>
+                <td width="80" align="left">{{=form.custom.widget.name}}</td>
+                <td width="50" align="right">数据源：</td>
+                <td width="80" align="left">{{=form.custom.widget.source}}</td>
+                <td width="120" align="center">{{=form.custom.submit}}</td>
+            </tr>
+        </table>
+    {{=form.custom.end}}
+    </div>
+</div>
+
+<div class="panel-body1">
+    <div class="delete-all">
+        您最多可创建 <font color="red">{{=session.user.dataSourceLimit}}</font> 个标签项目
+    </div>
+    <div class="add-user">
+        <button type="button" class="btn btn-primary" id='new'>新增标签项目</button>
+    </div>
+</div>
+
+<div class="panel-body">                           
+    <table class="table">
+        <thead>
+            <tr>
+                <th width="5%">编号</th>
+                <th width="20%">项目名称</th>
+                <th width="20%">数据源</th>
+                <th width="15%">状态</th>
+                <th width="20%">创建时间</th>
+                <th width="20%">操作</th>
+            </tr>
+        </thead>
+        <tbody id="tblProj" url={{=URL('sync')}}>
+        {{for i, d in enumerate(data):}}
+            <tr align="center">
+                <td>{{=i+1}}</td>
+                <td>{{=d.tagProj.tpName}}</td>
+                <td>{{='%s (%s)' %(d.dataSource.dsName,d.dataSource.cookieDomain)}}</td>
+                <td>{{=d.tagProj.tpStatus}}</td> 
+                <td>{{=d.tagProj.date}}</td>                                                  
+                <td><a href="{{=URL('sync',vars=dict(tpId=d.tagProj.tp_id,dsId=d.dataSource.d_id))}}">同步数据</a>&nbsp;&nbsp;
+                       <a href="#">编辑</a>&nbsp;&nbsp;
+                       <a href="#">删除</a>
+                </td>
+            </tr> 
+        {{pass}}
+        </tbody>
+    </table>
+</div>
+{{end}}
+
+
+{{block script}}
+jQuery('#no_table_name').attr('class','form-control form-input');
+jQuery("#no_table_source option:first ").remove();
+jQuery("#new").attr("onclick","location='{{=URL('new')}}'");
+jQuery("#side_tp").attr("id","now-nav");
+jQuery('#sub').attr('class','btn btn-primary');
+jQuery("#sub").click(function(e){
+    alert('sub click');
+    e.preventDefault();
+    $.ajax({
+        type: "post",
+        url: "{{=URL('projFind')}}",
+        data: {"_formkey":jQuery("[name='_formkey']").val(),
+                    "_formname":jQuery("[name='_formname']").val(),
+                    "name":jQuery("#no_table_name").val(),
+                    "source":jQuery("#no_table_source option:selected").val()},
+        dataType: "json",
+        success: function(data){//成功时执行函数
+            alert(data.data.length);
+            tbl = jQuery("#tblProj");
+            tbl.children().remove()
+            url = tbl.attr('url');
+           for(var i=0; i<data.data.length; i++)
+              {
+                   tr = $('<tr align="center"></tr>');
+                td = $('<td></td>');
+                td.text(i+1);
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].tagProj.tpName);
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].dataSource.dsName+' ('+data.data[i].dataSource.cookieDomain+')');
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].tagProj.tpStatus);
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].tagProj.date);
+                tr.append(td);
+                td = $('<td></td>');
+                a = $('<a>同步数据</a>');                
+                a.attr('href', url+'?dsId='+data.data[i].dataSource.d_id+'&tpId='+data.data[i].tagProj.tp_id);
+                td.append(a);
+                td.append('&nbsp;&nbsp;');
+                a = $('<a>编辑</a>');
+                a.attr('href', '#');
+                td.append(a);
+                td.append('&nbsp;&nbsp;');
+                a = $('<a>删除</a>');
+                a.attr('href', '#');
+                td.append(a);
+                tr.append(td);
+                tbl.append(tr);
+              }
+        }
+    });
+});
+{{end}}

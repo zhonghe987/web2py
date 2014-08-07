@@ -1,0 +1,54 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+.block-margin{
+    margin:5px 5px 5px 5px;
+}
+</style>
+{{end}}
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body bt-border">
+                <h4 align="left">标签：<font color="red">{{=tagName}}</font></h4>
+            </div>
+            <div class="panel-body">                           
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th width="5%">编号</th>
+                            <th width="15%">日期</th>
+                            <th width="15%">处理量</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{for i, r in enumerate(data):}}
+                        <tr align="center">
+                            <td>{{=i+1}}</td>
+                            <td>{{=r[0]}}</td>
+                            <td>{{=r[1]}}</td>
+                        </tr> 
+                        {{pass}}                                                         
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-md-12" align="center">
+                <button id="back" class="btn" style="margin-top:5px">返回</button>
+            </div>                                
+        </div>
+    </div> 
+</div>
+{{end}}
+
+{{block  script}}
+jQuery("#back").click(function(){
+    window.location = "{{=URL('tagManage')}}"
+});
+{{end}}
+
+{{block script func}}
+{{end}}

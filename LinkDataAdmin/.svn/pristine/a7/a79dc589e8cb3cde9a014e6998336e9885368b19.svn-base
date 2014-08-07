@@ -1,0 +1,8 @@
+{{left_sidebar_enabled=True}}
+
+{{block left_sidebar}}
+数据源管理
+新建数据源
+标签项目管理
+新建标签项目
+{{end}}

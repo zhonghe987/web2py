@@ -1,0 +1,38 @@
+﻿{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+
+数据源管理
+{{=form}}
+<button type="button">批量删除</button>
+<button type="button" onclick="location.href='{{=URL('new')}}'">新增数据源</button>
+<div class="data">
+<table>
+	<thead>
+		<tr>
+			<th> 
+				<div class="checker" id="uniform-undefined"><span class=""><input type="checkbox" style="opacity: 0;"></span></div></th>
+			<th>编号</th>
+		<th>数据源名称</th>
+		<th>Cookie域</th>
+		<th>创建时间</th>
+		<th>状态</th>
+		<th>操作</th>
+		</tr>
+		</thead>
+	{{for da in data:}}
+	<tr  style="border:1px;">
+		
+		
+		<td align="center"><div class="checker" id="uniform-undefined"><span class=""><input type="checkbox" style="opacity: 0;"></span></div></td>
+		<td>{{=da.d_id}}</td>
+		<td>{{=da.dsName}}</td>
+		<td>{{=da.cookieDomain}}</td>
+		<td>{{=da.date}}</td>
+		<td>{{=da.dsStatus}}</td>
+		<td>查看    </td>
+		
+	</tr>
+	{{pass}}
+</table>
+</div>

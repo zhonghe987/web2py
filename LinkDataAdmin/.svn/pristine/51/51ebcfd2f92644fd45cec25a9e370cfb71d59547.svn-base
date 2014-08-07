@@ -1,0 +1,22 @@
+# -*- coding: utf-8 -*-
+
+def login():
+    btn = INPUT(_value='登录',_id='subl', _type='submit',_class='btn btn-success loginbtn')
+    form = SQLFORM.factory(
+                               Field('user', requires=IS_NOT_EMPTY()), 
+                               Field('pwd', requires=IS_NOT_EMPTY()),
+                               buttons=[btn]
+                               )
+
+    if form.accepts(request, session):
+        user = lda_db((lda_db.account.userName == form.vars.user) & (lda_db.account.passwd == form.vars.pwd)).select().first()
+        if user:
+            session.user = user
+            redirect(URL('dataSource', 'index'))
+        else:
+            response.flash = '用户名或密码错误'
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form'
+    return dict(form=form)

@@ -1,0 +1,16 @@
+﻿{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+数据源信息
+基本信息
+数据源名称：
+Cookie域:
+
+KeyName信息
+keyName1:
+值长度：字节
+keyName2:
+值长度：字节
+keyName3:
+值长度：字节
+<button type="button" onclick="location.href='{{=URL('index')}}'">返回</button>

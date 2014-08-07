@@ -1,0 +1,126 @@
+{{ from AppFunc import getStatus, getStatusButton}}
+
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+
+
+
+<div class="panel-body1">
+    
+    <div class="add-user">       
+         <a type="button" href="{{=URL('orignalData','orignalDataConf')}}  "class="btn btn-primary">新增数据源配置</a>
+    </div>
+</div>
+
+<div class="panel-body">                  
+    <table class="table">
+        <thead>
+            <tr>
+                
+                <th>编号</th>
+                <th>源配置名称</th>
+                <th>数据引擎</th>
+                <th>IP地址</th>
+                <th>端口号</th>
+                <th>数据库名称</th>
+                <th>表名称</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody  id="data" >
+        {{for i, da in enumerate(data):}}
+            <tr  align="center">
+                
+                <td>{{=i+1}}</td>
+                <td>{{=da.name}}</td>
+                <td>{{=da.dbEngine}}</td>
+                <td>{{=da.host}}</td>
+                <td>{{=da.port}}</td>
+                <td>{{=da.dbName}}</td>
+                <td >{{=da.tableName}}</td>
+                <td>
+                    <a href='#' data-toggle="modal" data-target="#edit" onclick = "getData({{=da.oid}})" id="{{=da.oid}}">编辑</a>&nbsp;&nbsp;
+                    <a href="{{=URL('orignalDelete',vars = dict(id = da.oid))}}">删除</a>
+                </td>
+             </tr> 
+         {{pass}}                         
+         </tbody>
+     </table>
+     
+  </div>
+  <div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div id="adds" class="modal-body bq">
+                </div>
+               <div class="modal-footer">
+                    <button type="button" id="subs" class="btn btn-primary">继续保存</button>
+                    <button type="button" id="canl" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+{{end}}
+
+{{block  script}}
+//表单提交
+jQuery('#subs').click(function(){
+	var ids = $('form').attr('name');
+	
+	$('#form').submit();
+});
+
+{{end}}
+{{block script func}}
+//蒙版效果的编辑
+function getData(id){
+	jQuery('#canl').attr('onclick',"del("+id+")");
+	$.ajax({
+		type:"post",
+		url:"{{=URL('orignalData','oringalEdit')}}",
+		data:{'id':id},
+		dataType:"json",
+		success:function(data){
+			//alert(data.data[0].oid);
+			$('#adds').append('<div id='+id+' class="panel-body">'
+				    +'<form action="edit?ids='+id+'" method="post"  id="form">'
+                    +'<table width="600" align="center" border="0"  cellspacing="0" cellpadding="0" class="panel-body table-control">'
+                    +'<tr>'
+                    +'<td width="150" align="right">源配置名称：</td>'
+                    +'<td width="220"><input name="dataName" type="text" class="form-control" value='+data.data[0].name+'></td>'
+                    +'<td width="150" align="right">数据库引擎：</td>'
+                    +'<td width="220"><input type="text" name="dbEngine" class="form-control" value='+data.data[0].dbEngine+'></td>'
+                    +'</tr>'
+                    +'<tr>'
+                    +'<td width="150" align="right">IP地址：</td>'
+                    +'<td width="220" ><input type="text" name="ip" class="form-control" value='+data.data[0].host+'></td>'
+                    +'<td width="150" align="right">端口号：</td>'
+                    +'<td width="220" ><input type="text"  name="port" class="form-control" value='+data.data[0].port+'></td>'
+                    +'</tr>'
+                    +'<tr>'
+                    +'<td width="150" align="right">数据库名称：</td>'
+                    +'<td width="220"><input type="text" name="dbName" class="form-control" value='+data.data[0].dbName+'></td>'
+                    +'<td width="150" align="right">表名称：</td>'
+                    +'<td width="220"><input type="text"  name="tableName" class="form-control" value='+data.data[0].tableName+'></td>' 
+                    +'</tr>'
+                    +'</table>' 
+                    +'</form></div></div>'
+                    );
+		}
+	});
+}
+//去掉已点击出现的div
+function del(id){
+	$('div[id='+id+']').remove();
+}
+{{end}}
+

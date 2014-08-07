@@ -1,0 +1,74 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = False}}
+{{extend 'layout.html'}}
+{{block head}}
+
+{{end}}
+{{block content}}
+<div class="panel-body">
+    <div class="table-control">
+        <div class="bq">
+        {{=form.custom.begin}}
+        <table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+        	<th >
+        		<td hight="10" align="left" id="shw"></td>
+        		<td height="10" width="100" id ="d" align="left"></td>
+        	</th>
+            <tr>
+                 <td width="100" align="right">标签名称：</td>
+                 <td width="160" id="names" align="left">{{=form.custom.widget.dataSname}}</td>
+                 <td width="100" align="right">大类别：</td>
+                 <td width="160" id="domains" align="left">{{=form.custom.widget.cookiedom}}</td>
+                 <td width="50" align="right">小类别：</td>
+                 <td width="160" align="left">{{=form.custom.widget.status}}</td>
+                 <td width="120" align="center">{{=form.custom.submit}}</td>
+            </tr>
+        </table>
+        {{=form.custom.end}}
+        </div>
+    </div>
+</div>
+
+<div class="panel-body1">
+    <div class="delete-all">
+        <button type="button" href="#" id="lock" class="btn btn-default">以创建4个标签</button>
+    </div>
+    <div class="add-user">
+        <a type="button" href="{{=URL('tagManage','new')}}  "class="btn btn-primary">新增数据源</a>
+    </div>
+</div>
+
+<div class="panel-body">                           
+    <table class="table">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>标签名称</th>
+                <th>大类别</th>
+                <th>小类别</th>
+                <th>近七天处理量（个）</th>
+                <th>创建时间</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody >
+        {{for i, da in enumerate(data):}}
+            <tr align="center">
+                <td>1</td>
+                <td>tag</td>
+                <td>jia</td>
+                <td>dian</td>
+                <td>34535</td>
+                <td>2014-05-27</td>
+                <td>
+                    <a href='{{=URL("show",vars=dict(sh_id=da.d_id))}}'>编辑</a>&nbsp;&nbsp;
+                    <a href='#'  onclick=changeStatus({{=da.d_id}},{{=i+1}}) id="btn_{{=i+1}}">处理历史</a>&nbsp;&nbsp;
+                    <a href="{{=URL('dele',vars=dict(de_id=da.d_id))}}">删除</a>
+                </td>
+             </tr> 
+         {{pass}}                         
+         </tbody>
+     </table>
+  </div>
+{{end}}

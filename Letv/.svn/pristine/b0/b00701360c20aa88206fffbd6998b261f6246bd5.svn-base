@@ -1,0 +1,47 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = False}}
+
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+	.png{
+		align:"center";
+		background:url({{=URL('Letv','static/assets/img/pipg.png')}});
+		padding: 15px;
+		background-color: #fff;
+		height:300px;
+		width:400px;
+	}
+</style>
+{{end}}
+{{block content}}
+<div class='panel-body'  style="border-style:groove;">
+<div class="panel-body" align ="center">
+	<div class="panel-body  png"  style = "float: left;width: 600px;height:400px;border-style:groove; "> 
+		<h2 align="left">标签管理</h2>
+		<p align="left">------------------------</p>
+		<p align="left">已创建{{=tag_num}}个标签</p>
+	</div>
+	<div class="panel-body png" style ="float: right;width: 600px;height:400px;border-style:groove;">
+		<h2 align="left">标签类管理</h2>
+		<p align="left">-------------------------</p>
+		<p align="left">以创建{{=tag_class}}个类别</p>
+	</div>
+	
+	<br/>
+	</div>
+	
+	<div class="panel-body">
+	<div class="panel-body png" style="width: 80%;height:400px;border-style:groove;">
+		<h2 align="left">系统历史</h2>
+		<p align="left">-------------------------</p>
+		
+	</div>
+	</div>
+	</div>
+	
+
+   
+      
+{{end}}

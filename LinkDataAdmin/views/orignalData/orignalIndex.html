@@ -1,0 +1,214 @@
+{{ from AppFunc import getStatus, getStatusButton }}
+
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+
+
+
+
+<div class="panel-body">  
+	<div class="add-user">       
+         <a type="button" href="{{=URL('orignalData','orignalDataConf')}}" style="margin-bottom:10px;"  class="btn btn-primary">新增数据源配置</a>
+    </div>               
+    <table class="table">
+        <thead>
+            <tr>
+                <th>编号</th>
+                <th>源配置名称</th>
+                <th>数据引擎</th>
+                <th>用户名称</th>
+                <th>密码</th>
+                <th>IP地址</th>
+                <th>端口号</th>
+                <th>数据库名称</th>
+                <th>表名称</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody  id="data" >
+        {{for i, da in enumerate(data):}}
+            <tr  align="center">
+                <td>{{=i+1}}</td>
+                <td>{{=da.name}}</td>
+                <td>{{=da.dbEngine}}</td>
+                <td>{{=da.dbUser}}</td><br />
+                <td>{{=da.dbPwd}}</td>
+                <td>{{=da.host}}</td>
+                <td>{{=da.port}}</td>
+                <td>{{=da.dbName}}</td>
+                <td >{{=da.tableName}}</td>
+                <td>{{=getStatus(da.status)}}</td>
+                <td>
+                    <a href='#' data-toggle="modal" data-target="#edit" onclick = "getData({{=da.oid}})" id="{{=da.oid}}">编辑</a>&nbsp;&nbsp;
+                    <a data-toggle="modal" data-target="#deles"  onclick ="getId({{=da.oid}})" id="{{=da.oid}}"  href="#">删除</a>
+                </td>
+             </tr> 
+         {{pass}}                         
+         </tbody>
+     </table>
+     
+  </div>
+  <div class="modal fade" id="edit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div style="width:900px" class="modal-content">
+                <div class="modal-header">
+                    
+                    <h4 class="modal-title" id="myModalLabel">编辑</h4>
+                </div>
+                <div id="adds" class="modal-body bq">
+                </div>
+               <div class="modal-footer">
+                    <button type="button" id="subs" class="btn btn-primary">保存</button>
+                    <button type="button" id="canl" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+     <div class="modal fade" id="deles" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div class="modal-body">
+                    <p>确定删除？</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="come" class="btn btn-primary">继续</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+ 
+{{end}}
+
+{{block  script}}
+//表单提交
+jQuery('#subs').click(function(){
+	$('#form').submit();
+});
+
+{{end}}
+{{block script func}}
+//蒙版效果的编辑
+function getData(id){
+	jQuery('#canl').attr('onclick',"del("+id+")");
+	$.ajax({
+		type:"post",
+		url:"{{=URL('orignalData','oringalEdit')}}",
+		data:{'id':id},
+		dataType:"json",
+		success:function(data){
+			//alert(data.data[0].oid);
+			$('div [id="adds"]').children().remove();
+			var status = statusChange(data.data[0].status);
+			$('#adds').append('<div id='+id+'>'
+				              +'<form action="edit?ids='+id+'" method="post"  id="form">'
+			                  +'<div class="panel-body bt-border">基本信息'
+			                  +'<div class="form-title"></div>'
+                              +'<table width="600" border="0" cellspacing="0" cellpadding="0" class="panel-body bt-border table-control">'
+                              +'<tr>'
+                              +'<td width="150" align="right">源配置名称：</td>'
+                              +'<td width="200"><input name="dataName" type="text" class="form-control" value='+data.data[0].name+'></td>'
+                              +'<td align="left" width="200" id="su"></td>'
+                              +'</tr>'
+                              +'<tr>'
+            	              +'<td width="150" align="right">数据库引擎：</td>'
+                              +'<td width="200"><input type="text" name="dbEngine" class="form-control" value='+data.data[0].dbEngine+'></td>'
+                              +'<td align="left" id="engine"></td>'
+                              +'</tr>'
+                              +'<tr>'
+            	              +'<td width="150" align="right">状态：</td>'
+                              +'<td width="200"><input type="text" onblur="check('+id+');" id="status"  name="status" class="form-control" value='+status+'></td>'
+                              +'&nbsp;&nbsp;<td align="left" style="color:red;" id="s"></td>'
+                              +'</tr>'
+                              +'</table>'
+                              +'</div>'
+                              +'<div class="panel-body bt-border">'
+                              +'<div class="form-horizontal" role="form">'
+                              +'<div class="form-title">数据库信息</div>'
+                              +'<table width="700" border="0" cellspacing="0" cellpadding="0" class="panel-body bt-border table-control">'
+                              +'<tr>'
+                              +'<td width="180" align="right">用户名：</td>'
+                              +'<td width="200" ><input type="text"  name="dbUser" class="form-control" value='+data.data[0].dbUser+'></td>'
+                              +'<td width="150" align="right">密码：</td>'
+                              +'<td width="200" ><input type="text"  name="dbPwd" class="form-control" value='+data.data[0].dbPwd+'></td>'
+                              +'</tr>'
+                              +'<tr>'
+                              +'<td width="150" align="right">IP地址：</td>'
+                              +'<td width="200" ><input type="text" name="ip"  class="form-control" value='+data.data[0].host+'></td>'
+                              +'<td width="150" align="right">端口号：</td>'
+                              +'<td width="200" ><input type="text"  name="port" class="form-control" value='+data.data[0].port+'></td>'
+                              +'</tr>'
+                              +'<tr>'
+                              +'<td width="150" align="right">数据库名称：</td>'
+                              +'<td width="200"><input type="text" name="dbName" class="form-control" value='+data.data[0].dbName+'></td>'
+                              +'<td width="150" align="right">表名称：</td>'
+                              +'<td width="200"><input type="text"  name="tableName" class="form-control" value='+data.data[0].tableName+'></td>'
+                              +'</tr>'
+                              +'</table>'                                    
+                              +'</div> '                               
+                              +'</div></form></div>');
+		}
+	});
+}
+//去掉已点击出现的div
+function del(id){
+	$('div[id='+id+']').remove();
+}
+
+
+function statusChange(statu){
+	if (statu =="no"){
+		return '不选中'
+	}else if(statu == 'yes'){
+		return '选中'
+	}
+}
+
+function  check(id){
+	var st = $("#status").val();
+	if(st =="选中"){
+		$.ajax({
+		type:"post",
+		url:"{{=URL('orignalData','getStatus')}}",
+		data:{'statu':'yes','id':id},
+		dataType:"json",
+		success:function(data){
+			if(data.data == 0){
+				$('#s').text('已有一个配置被选中');
+				$('#status').val('不选中');
+			}
+		}
+	});
+	}
+}
+
+function getId(id){
+	jQuery('#come').attr('onclick','dele('+id+')');
+}
+
+function dele(id){
+	$.ajax({
+		type:"post",
+		url:"{{=URL('orignalData','orignalDelete')}}",
+		data:{'id':id},
+		dataType:"json",
+		success:function(data){
+			if(data.data == 0){
+				window.location.reload();
+			}
+		}
+	});
+}
+{{end}}
+

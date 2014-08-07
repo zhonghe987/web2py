@@ -1,0 +1,34 @@
+# -*- coding: utf-8 -*-
+
+
+def index():
+    form = FORM('项目名称', INPUT(_name='name'),
+                '数据源:', INPUT(_name='domain'), 
+                INPUT(_type='submit', _value='搜索'))
+    if form.accepts(request, session):
+        response.flash = 'data accepted'
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form -> %s' %session.user
+    return dict(form=form)
+
+def new():
+    dataSource = lda_db(lda_db.dataSource.account_id==session.user.id).select()
+    options = [OPTION(ds.dsName, _value=ds.id) for ds in dataSource]
+    options[0].selected = True
+    form = FORM('项目名称', INPUT(_name='name', requires=IS_NOT_EMPTY()),
+                '数据源:', SELECT(*options,_name='dataSource'), 
+                INPUT(_type='submit', _value='保存'),
+                INPUT(_type='button', _value='取消'))
+    if form.accepts(request, session):
+        r = lda_db.tagProj.insert(account_id=session.user.id, dataSource_id=form.vars.dataSource, tpName=form.vars.name)
+        response.flash = 'data accepted -> %s' %r
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form -> %s' %options
+    return dict(form=form)
+
+def sync():
+    return dict()

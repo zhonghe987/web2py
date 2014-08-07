@@ -1,0 +1,75 @@
+# -*- coding: utf-8 -*-
+
+
+def index():
+    s = [('all','全部')]
+    s.extend([(d.id,'%s (%s)' %(d.dsName,d.cookieDomain)) for d in lda_db(lda_db.dataSource.account_id == session.user.id).select()])
+    btn = INPUT(_value='搜索',_type='submit',_id='sub')
+    form = SQLFORM.factory(Field('name', requires=IS_NOT_EMPTY()),
+                                                      Field('source',requires=IS_IN_SET(s)),
+                                                      buttons = [btn]
+                  )
+    if form.accepts(request, session):
+        response.flash = 'data accepted'
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form -> %s' %session.user
+    return dict(form=form, panelTitle='标签项目管理')
+
+def new():
+    dataSource = lda_db(lda_db.dataSource.account_id==session.user.id).select()
+    options = [OPTION(ds.dsName, _value=ds.id) for ds in dataSource]
+    options[0].selected = True
+    form = FORM('项目名称', INPUT(_name='name', requires=IS_NOT_EMPTY()),
+                '数据源:', SELECT(*options,_name='dataSource'), 
+                INPUT(_type='submit', _value='保存'),
+                INPUT(_type='button', _value='取消'))
+    if form.accepts(request, session):
+        r = lda_db.tagProj.insert(account_id=session.user.id, dataSource_id=form.vars.dataSource, tpName=form.vars.name)
+        lda_db.executesql('CREATE TABLE Tag_%s (ds_id int, ti_id int, primary key (ds_id)) engine=MyISAM DEFAULT CHARSET=utf8' %r)
+        lda_db.executesql('CREATE TABLE TagItem_%s (ti_id int, count int, value varchar(45), date datetime, primary key (ti_id)) engine=MyISAM DEFAULT CHARSET=utf8' %r)
+        response.flash = 'data accepted -> %s' %r
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form -> %s' %options
+    return dict(form=form)
+
+def sync():
+    response.flash = '%s' %session.user
+    # test 
+    dsId = 1
+    projId = 1
+    btn = INPUT(_value='上传已标记的cookie数据', _type='submit')
+    import os
+    cvs_form = SQLFORM.factory( Field('filename', 'upload',uploadfolder=os.path.join(request.folder,'uploads')),
+                                                               btn = [btn]
+                  )
+    if cvs_form.accepts(request, formname='cvs_form'):
+        response.flash = 'file upload: %s' %cvs_form.vars
+        if cvs_form.vars.filename:
+            p = os.path.join(request.folder,'uploads')
+            response.flash = p+cvs_form.vars.filename
+            os.rename(os.path.join(p,cvs_form.vars.filename), os.path.join(p,'test.zip'))
+    else:
+        response.flash = 'error'
+    return dict(form=cvs_form)
+
+
+def downAll():
+    import os
+    filename = 'test.txt'
+    path = os.path.join(request.folder, 'private', filename)
+    response.headers['Content-type'] = 'application/octet-stream'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' %filename
+    return response.stream(open(path), chunk_size=4096)
+
+
+def downIncr():
+    import os
+    filename = 'incr.txt'
+    path = os.path.join(request.folder, 'private', filename)
+    response.headers['Content-type'] = 'application/octet-stream'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' %filename
+    return response.stream(open(path), chunk_size=4096)

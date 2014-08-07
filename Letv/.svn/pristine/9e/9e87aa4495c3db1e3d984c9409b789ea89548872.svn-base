@@ -1,0 +1,59 @@
+{{header = False}}
+{{sidebar = False}}
+{{extend 'layout.html'}}
+{{block log}}
+<section id="login-container">
+
+        <div class="row">
+            <div class="col-md-3" id="login-wrapper">
+                <div class="panel panel-primary animated flipInY">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">登录</h3>
+                    </div>
+                    <div class="panel-body">
+                    	{{=form.custom.begin}}
+                       
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                	{{=form.custom.widget.username}}
+                                    <!--<input type="user" class="form-control" id="email" placeholder="用户名">-->
+                                    <i class="fa fa-user"></i>
+                                </div>
+                            </div>
+                            <br/>
+                            <br/>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                	{{=form.custom.widget.password}}
+                                  <!--  <input type="password" class="form-control" id="password" placeholder="密码">-->
+                                   <br/>
+                                   <i class="fa fa-lock"></i>
+                                   <a href="javascript:void(0)" class="help-block">忘记密码?</a>
+                                   <i class="fa fa-lock"></i>
+                                   <a href = "{{=URL('admin','register')}}"class= "help-block">用户注册</a>
+                                </div>
+                                
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                	{{=form.custom.submit}}
+                                    <!--<a href="index.html" class="btn btn-primary btn-block">登录</a>-->
+                                </div>
+                            </div>
+                       
+                        {{=form.custom.end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+{{end}}
+{{block script}}
+jQuery('#auth_user_password').attr('class','form-control');
+jQuery('#auth_user_password').attr('placeholder','密码');
+jQuery('#auth_user_username').attr('class','form-control');
+jQuery('#auth_user_username').attr('placeholder','用户名');
+jQuery('#auth_user_username').attr('type','user');
+jQuery("[type='submit']").addClass('btn btn-primary btn-block').attr("value","登录");
+{{end}}

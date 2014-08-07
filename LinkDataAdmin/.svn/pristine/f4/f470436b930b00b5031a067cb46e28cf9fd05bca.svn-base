@@ -1,0 +1,229 @@
+{{ from AppFunc import getStatus, getStatusButton}}
+
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+
+<div class="panel-body">
+    <div class="table-control">
+        <div class="bq">
+        <form action="index" method="post" id="form">
+        <table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+                              <tr>
+                                <td width="100" align="right">数据源名称：</td>
+                                <td width="160" align="left"><input id="dataSname" name="dataSname" type="text" class="form-control form-input"></td>
+                                <td width="100" align="right">Cookie域名：</td>
+                                <td width="160" align="left">{{=cookie}}</td>
+                                <td width="50" align="right">状态：</td>
+                                <td width="160" align="left">{{=status}}</td>
+                                <td width="120" align="center"><button type="button" id="sub" class="btn btn-default">搜索</button></td>
+                              </tr>
+                            </table>
+        </form>
+        </div>
+    </div>
+</div>
+
+<div class="panel-body1">
+    <div class="delete-all">
+        <button type="button" href="#" id="lock" class="btn btn-default">批量冻结</button>
+    </div>
+    <div class="add-user">
+        <a type="button" href="{{=URL('dataSource','new')}}  "class="btn btn-primary">新增数据源</a>
+    </div>
+</div>
+
+<div class="panel-body"> 
+	<div class="delete-all">
+        您最多可创建 <font color="red">4</font> 个数据源
+    </div>                     
+    <table class="table">
+        <thead>
+            <tr>
+                <th><input type="checkbox" id="checkall" ></th>
+                <th>编号</th>
+                <th>数据源名称</th>
+                <th>Cookie域</th>
+                <th>创建时间</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody  id="data" >
+        {{for i, da in enumerate(data):}}
+            <tr  align="center">
+                <td><input type="checkbox" name='box' id={{=da.d_id}}></td>
+                <td>{{=i+1}}</td>
+                <td>{{=da.dsName}}</td>
+                <td>{{=da.cookieDomain}}</td>
+                <td>{{=da.date}}</td>
+                <td id="row_{{=i+1}}" data="{{=da.dsStatus}}">{{=getStatus(da.dsStatus)}}</td>
+                <td>
+                    <a href='{{=URL("show",vars=dict(sh_id=da.d_id))}}'>查看</a>&nbsp;&nbsp;
+                    <a href='#'  onclick=changeStatus({{=da.d_id}},{{=i+1}}) id="btn_{{=i+1}}">{{=getStatusButton(da.dsStatus)}}</a>&nbsp;&nbsp;
+                    <a href="{{=URL('dele',vars=dict(de_id=da.d_id))}}">删除</a>
+                </td>
+             </tr> 
+         {{pass}}                         
+         </tbody>
+     </table>
+     
+  </div>
+ 
+{{end}}
+
+{{block script}}
+
+   jQuery('#sub').attr('class','btn btn-primary');          
+	   
+	   
+	   //复选框
+  jQuery('#checkall').click(function(){
+    if (this.checked) {
+        $("input[name='box']:checkbox").each(function() { 
+             $(this).prop("checked", true);
+             $(this).attr('vs','t1');
+             var v = $(this).attr('id');
+             var it = "#"+v+"";
+             $(this).attr('onclick',"btn_remove('"+it+"')");
+            });
+    } else {
+        $("input[name='box']:checkbox").each(function() { 
+            $(this).prop("checked", false);
+            $(this).removeAttr('vs');
+           });
+    }
+   });
+  jQuery("#lock").click(function(){
+  	var daV='';
+  	$('input[vs="t1"]:checkbox').each(function(){
+  		daV+=$(this).attr('id')+',';
+  	});
+  	if(daV){
+  	$.ajax({
+  		type: "POST",
+  		url: "{{=URL('lock_batch')}}",
+  		data: {'all_ids':daV},
+  		dataType: "json",
+  		success:function(data){
+  			if (data==0){
+  				window.location.href="{{=URL('index')}}"
+  			}
+  		}
+  		
+  	});
+  	}
+  });
+	   
+	   
+jQuery("#sub").click(function(e){
+    //alert('sub click');
+    e.preventDefault();
+    $.ajax({
+        type: "post",
+        url: "{{=URL('dataSource','sourceFind')}}",
+        data: {"_formkey":jQuery("[name='_formkey']").val(),
+                    "_formname":jQuery("[name='_formname']").val(),
+                    "dataSname":jQuery("#dataSname").val(),
+                    "cookiedom":jQuery("#cookiedom option:selected").val(),
+                    "status":jQuery("#status option:selected").val(),
+                    },
+        dataType: "json",
+        success: function(data){//成功时执行函数
+            tbl = jQuery("#data");
+            tbl.children().remove();
+            
+            for(var i=0; i < data.data.length; i++)
+              {
+                tr = $('<tr  align="center"></tr>');
+                tr.append("<td><input type='checkbox' name='box' id="+data.data[i].d_id+"></td>");
+                td = $('<td></td>');
+                td.text(i+1);
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].dsName);
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].cookieDomain);
+                tr.append(td);
+                td = $('<td></td>');
+                td.text(data.data[i].date);
+                tr.append(td);
+                td = $('<td></td>');
+                td.attr('id','row_'+(i+1)+'');
+                td.attr('data',(data.data[i].dsStatus));
+                td.text(getStatus(data.data[i].dsStatus));
+                tr.append(td);
+                td = $('<td></td>');
+                a = $('<a>查看</a>');                
+                a.attr('href', 'show'+'?sh_id='+data.data[i].d_id);
+                td.append(a);
+                td.append('&nbsp;&nbsp;&nbsp;');
+                a = $('<a>'+change(data.data[i].dsStatus)+'</a>');
+                a.attr('href', '#');
+                a.attr('id','btn_'+(i+1)+'');
+                a.attr('onclick','changeStatus('+data.data[i].d_id+','+(i+1)+')');
+                td.append(a);
+                td.append('&nbsp;&nbsp;&nbsp;');
+                a = $('<a>删除</a>');
+                a.attr('href', 'dele'+'?de_id='+data.data[i].d_id);
+                td.append(a);
+                tr.append(td);
+                tbl.append(tr);
+              }
+              
+        }
+    });
+});
+	   
+
+{{end}}
+
+{{block script func}}
+function btn_remove(it){
+	if($(it).attr("vs")=='t1'){
+		$(it).removeAttr('vs');
+		}else{
+			$(it).attr('vs','t1');
+			}
+}
+
+function changeStatus(ds_id, obj_id){
+    s = jQuery("#row_"+obj_id).attr("data");
+    $.ajax({
+        type: "POST",
+        url: "{{=URL('changeStatus')}}",
+        data: {'status':s,'id':ds_id},
+        dataType: "json",
+        success: function(data){//成功时执行函数
+             //alert( "回调成功！"+data.status );
+             jQuery("#row_"+obj_id).attr("data", data.status);
+             jQuery("#row_"+obj_id).text(data.stName);
+             jQuery("#btn_"+obj_id).text(data.stButton);
+        }
+    });
+}
+
+
+function  getStatus(statu){
+	if (statu =="run"){
+	   return "正常";
+	}else if (statu == "stop"){
+	   return "暂停";
+	}
+}
+
+function change(status){
+	if (status =="run"){
+	   return '暂停';
+	}else if(status == "stop"){
+		return "启动";
+	}
+}
+{{end}}
+
+
+

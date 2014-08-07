@@ -1,0 +1,13 @@
+﻿{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+基本信息
+项目名称：
+数据源：
+同步标签项：
+已同步标签的cookie量:
+未同步标签的cookie量:
+请选择操作：
+<button type="button" >下载全部cookie数据</button>
+<button type="button" >仅下载未同步的cookie数据</button>
+<button type="button" >上传已标记的cookie数据</button>

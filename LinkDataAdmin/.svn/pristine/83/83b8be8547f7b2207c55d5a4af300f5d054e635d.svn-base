@@ -1,0 +1,84 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+
+<div class="panel-body">
+    <div class="table-control">
+        <div class="bq">
+      {{=form.custom.begin}} 
+        <table width="600" border="0" cellspacing="0" cellpadding="0" class="tabq">
+            <tr>
+                 <td width="150" align="right">源配置名称：</td>
+                 <td width="200">{{=form.custom.widget.confName}}</td>
+                 <td width="150" align="right">数据库引擎：</td>
+                 <td width="200">{{=form.custom.widget.dbEngine}}</td>
+            </tr>
+            <tr>
+                 <td width="150" align="right">IP地址：</td>
+                 <td width="200" >{{=form.custom.widget.host}}</td>
+                 <td width="150" align="right">端口号：</td>
+                 <td width="200" >{{=form.custom.widget.port}}</td>
+            </tr>
+            <tr>
+                 <td width="150" align="right">数据库名称：</td>
+                 <td width="200">{{=form.custom.widget.dbName}}</td>
+                 <td width="150" align="right">表名称：</td>
+                 <td width="200">{{=form.custom.widget.tableName}}</td>
+                 
+            </tr>
+        </table>
+       
+       
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div class="modal-body">
+                    <p>是否要继续保存？</p>
+            </div>
+            <div  id="app" class="modal-footer">
+            	{{=form.custom.submit}}
+                 
+               
+           </div>
+        </div>
+    </div>
+</div>
+
+ 
+{{=form.custom.end}}
+</div>
+    </div>
+</div>
+<div class="col-md-12" align="center">
+	<button type="button" id="new_button" class="btn btn-primary" data-toggle="modal" data-target="#basicModal">保存</button>&nbsp;&nbsp;&nbsp;&nbsp;
+    <button type="submit" id= "go" class="btn" >取消 </button>
+
+</div>
+
+
+
+{{end}}
+
+
+{{block script}}
+
+jQuery('#no_table_confName').attr('class','form-control');
+jQuery('#no_table_dbEngine').attr('class','form-control');
+jQuery('#no_table_host').attr('class','form-control');
+jQuery('#no_table_port').attr('class','form-control');
+jQuery('#no_table_dbName').attr('class','form-control');
+jQuery('#no_table_tableName').attr('class','form-control');
+jQuery('#no_table_dbEngine option').first().remove();
+jQuery("#subt").attr('class','btn btn-primary');
+jQuery("#go").click(function(){
+	window.location.href = "{{=URL('orignalData','orignalIndex')}}";
+});
+jQuery('#app div').append('<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>');
+{{end}}

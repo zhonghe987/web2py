@@ -1,0 +1,6 @@
+﻿{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+标签项目管理
+{{=form}}
+<button type="button" onclick="location.href='{{=URL('new')}}'">新增标签项目</button>

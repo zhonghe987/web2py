@@ -1,0 +1,9 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = False}}
+{{extend 'layout.html'}}
+{{block head}}
+
+{{end}}
+{{block content}}
+{{end}}

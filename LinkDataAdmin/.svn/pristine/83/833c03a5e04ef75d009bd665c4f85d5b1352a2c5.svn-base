@@ -1,0 +1,97 @@
+{{extend 'layout.html'}}
+{{block plane}}
+<div class="panel-title">
+<h3> <span class="panel-title" id="inter"> 接口说明  </span></h3>
+<p>{{=inter}}<br><br> 
+</p>
+<h3> <span class=" panel-title" id="reque"> 请求说明  </span></h3>
+<table width="100%" cellpadding="0" cellspacing="2" border="0" class="paratable">
+<tbody>
+<tr>
+<th width="200">参数名称
+</th>
+<th> 描述
+</th></tr><tr>
+<td> url
+</td>
+<td> {{=url}}
+</td></tr>
+<tr>
+<td> 参数
+</td>
+<td> {{=args}}
+</td></tr>
+<tr>
+<td> 格式
+</td>
+<td> {{=format}}
+</td></tr>
+<tr>
+<td> http请求方式
+</td>
+<td> {{=https}}
+</td></tr>
+</tbody>
+</table>
+
+<p><br>
+</p>
+<p><br>
+</p>
+
+<h3> <span class="panel-title"> 参数说明  </span></h3>
+<table width="100%" class="paratable panel-title" border="0" cellspacing="2" cellpadding="0">
+
+<tbody><tr>
+<th width="200"> 参数名称
+</th>
+<th> 描述
+</th></tr>
+<tr>
+<td> name
+</td>
+<td> {{=args_name}}
+</td></tr>
+</tbody></table>
+<p><br>
+</p>
+<p><br>
+</p>
+<h3> <span class="panel-title"> 请求示例  </span></h3>
+<p></p>
+<pre>{{=example}}</pre> 
+<p><br>
+</p>
+<h3><span class="mw-headline panel-title" > 返回参数说明  </span></h3>
+<p>json返回结果：</p>
+<p>{{=json}}</p>
+<table width="100%" class="paratable panel-title" border="0" cellspacing="2" cellpadding="0">
+	<tbody>
+<tr>
+<th width="200">参数名称
+</th>
+<th> 描述
+</th></tr>
+<tr>
+<td width="200">msg
+</td>
+<td> 中文错误信息
+</td></tr>
+	<tr>
+<td> data
+</td>
+<td> 返回的数据,格式为{}
+</td></tr>
+<tr>
+<td> errcode
+</td>
+<td> 错误信息的编号
+</td></tr>
+<tr>
+<td> ret
+</td>
+<td> 
+</td></tr>
+</table>
+</div>
+{{end}}

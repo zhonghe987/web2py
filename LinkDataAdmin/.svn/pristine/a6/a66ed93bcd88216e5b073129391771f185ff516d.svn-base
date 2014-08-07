@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{=URL('static','assets/img/favicon.ico')}}" type="image/x-icon">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{=URL('static','assets/plugins/bootstrap/css/bootstrap.min.css')}}">
+    <!-- Fonts from Font Awsome   "{{=URL('static','images/favicon.ico')}}"-->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/font-awesome.min.css')}}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/animate.css')}}">
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/main.css')}}">
+    <!-- Fonts -->
+    <!-- <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,900,300italic,400italic,600italic,700italic,900italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'> -->
+    <!-- Feature detection -->
+    <script src="{{=URL('static','assets/js/modernizr-2.6.2.min.js')}}"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <section id="login-container">
+
+        <div class="row">
+            <div class="col-md-3" id="login-wrapper">
+                <div class="panel panel-primary animated flipInY">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">
+                            登录
+                        </h3>
+                    </div>
+                    <div class="panel-body">
+                    	
+                        <div class="form-horizontal" role="form">
+                        	{{=form.custom.begin}}
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <!--<input type="user" class="form-control" id="email" placeholder="用户名">  -->
+                                    {{=form.custom.widget.user}}
+                                    <i class="fa fa-user"></i>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    {{=form.custom.widget.pwd}}
+                                    <i class="fa fa-lock"></i>
+                                    <a href="javascript:void(0)" class="help-block">忘记密码?</a>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <!--<a href="index.html" class="btn btn-primary btn-block">登录</a> -->
+                                    {{=form.custom.submit}}
+                                </div>
+                            </div>
+                            {{=form.custom.end}}
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </section>
+    <!--Global JS-->
+    <script src="{{=URL('static','assets/js/jquery-1.10.2.min.js')}}"></script>
+    <script src="{{=URL('static','assets/plugins/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{=URL('static','assets/plugins/waypoints/waypoints.min.js')}}"></script>
+    <script src="{{=URL('static','assets/plugins/nanoScroller/jquery.nanoscroller.min.js')}}"></script>
+    <script src="{{=URL('static','assets/js/application.js')}}"></script>
+
+<script>
+	jQuery(document).ready(function(){
+		jQuery('#no_table_pwd').attr('class','form-control');
+		jQuery('#no_table_pwd').attr('placeholder','密码');
+		jQuery('#no_table_pwd').attr('type','password');
+		jQuery('#no_table_user').attr('class','form-control');
+		jQuery('#no_table_user').attr('placeholder','用户名');
+		jQuery('#no_table_user').attr('type','user');
+		jQuery('#sub').attr('class','btn btn-primary btn-block');
+		
+	});
+</script>
+
+</body>
+
+</html>

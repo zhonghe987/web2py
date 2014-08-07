@@ -1,0 +1,116 @@
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+.block-10 {
+    margin:10px 10px;
+}
+.block-40-20{
+    margin:10px 40px;
+}
+</style>
+{{end}}
+
+{{block plane}}
+<div class="panel-title">
+    <h2 class="block-10" id="inter"> 接口说明:</h2>
+    <h3 class="block-40-20">{{=inter}}</h3>
+
+    <h3 class="block-10" id="reque"> 请求说明:</h3>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="table-control">
+                <table width="100%" class="table">
+                    <thead>
+                        <th width="30%">参数名称</th>
+                        <th width="70%"> 描述</th>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>url</td>
+                            <td>{{=url}}</td>
+                        </tr>
+                        <tr>
+                            <td>参数</td>
+                            <td>{{=args}}</td>
+                        </tr>
+                        <tr>
+                            <td> 格式</td>
+                            <td>{{=format}}</td>
+                        </tr>
+                        <tr>
+                             <td>http请求方式</td>
+                             <td> {{=https}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <h3 class="block-10"> 参数说明:</h3>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="table-control">
+                <table width="100%" class="table">
+                    <thead>
+                        <tr>
+                            <th width="30%">参数名称</th>
+                            <th width="70%">描述</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>name</td>
+                            <td>{{=args_name}}</td>
+                        </tr>
+                    </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<h3 class="block-10">请求示例:</h3>
+<pre class="block-40-20">{{=example}}</pre> 
+
+<h3 class="mw-headline block-10" >返回参数说明:</h3>
+<h4 class="block-40-20">json返回结果:</h4>
+<pre class="block-40-20">{{=json}}</pre>
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="table-control">
+                <table width="100%" class="table">
+                <thead>
+                    <tr>
+                        <th width="30%">参数名称</th>
+                        <th width="70%"> 描述</th>
+                    </tr>
+                 </thead>
+                 </tbody>
+                    <tr>
+                        <td>msg</td>
+                        <td> 中文错误信息</td>
+                    </tr>
+                    <tr>
+                        <td>data</td>
+                        {{if isinstance(json['data'],dict):}}
+                        <td> 返回的数据,格式为json;      "count":{{=json['data']['count']}}表示打上"年龄"标签的数据有{{=json['data']['count']}}条;     "act":"{{=json['data']['act']}}",表示执行的动作</td>
+                        {{elif panelTitle =='data API调用方法':}}
+                        <td> 返回的数据,格式为json;      "data":{{=json['data']}}表示打上"年龄"标签的所有数据{{=json['data']}};</td>
+                        {{elif panelTitle =='infos API调用方法':}}
+                        <td> 返回的数据,格式为json;      "cookieDomain":{{=json['data'][0]['cookieDomain']}}表示cookie域;     "dataSourceName":{{=json['data'][0]['dataSourceName']}}表示项目名称;   "createDate":{{=json['data'][0]['createDate']}}表示创建日期;    "name":{{=json['data'][0]['name']}}表示标签名</td>
+                        {{pass}}
+                    </tr>
+                    <tr>
+                        <td>errcode</td>
+                        <td>错误信息的编号</td>
+                    </tr>
+                    <tr>
+                        <td>ret</td>
+                        <td>返回码</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}

@@ -1,0 +1,48 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+
+{{end}}
+{{block content}}
+<div class="panel-body bt-border">
+	<div class="form-horizontal" role="form">
+                                	 {{=form.custom.begin}}
+                                <table width="500" border="0" cellspacing="0" cellpadding="0">
+                                  <tr>
+                                    <td align="right" width="155">标签类别：</td>
+                                    <td width="245">{{=form.custom.widget.mid_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">所属父类别：</td>
+                                    <td width="245">{{=form.custom.widget.big_name}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">备注：</td>
+                                    <td width="245">{{=form.custom.widget.log_mark}}</td>
+                                  </tr>
+                                </table>
+                                </div>
+                            </div>
+                    <div class="col-md-12" align="center">
+                       {{=form.custom.submit}}
+                    </div>
+                    {{=form.custom.end}}
+                     <div class="col-md-12" align="center">
+                       <button type="submit" class="btn">取消</button>
+                    </div>
+
+
+
+{{end}}
+{{block  script}}
+jQuery('#no_table_mid_name').attr('class','form-control');
+jQuery('#no_table_log_mark').attr('class','form-control');
+jQuery('#no_table_big_name option:first').remove();
+jQuery('#no_table_big_name').attr('class','form-control input-sm');
+jQuery('#subt').attr('class','btn btn-primary');
+
+
+
+{{end}}

@@ -1,0 +1,146 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+
+{{end}}
+{{block content}}
+<div class="row">
+                  <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                            <div class="table-control">
+                            <table width="900" class="bq">
+                              <tr>
+                                <td width="100" align="right">数据源名称：</td>
+                                <td width="160" align="left"><input type="text" class="form-control form-input"></td>
+                                <td width="100" align="right">Cookie域名：</td>
+                                <td width="160" align="left"><input type="text" class="form-control form-input"></td>
+                                <td width="50" align="right">状态：</td>
+                                <td width="160" align="left"><select class="form-control input-sm form-input">
+                                        <option value="">全部</option>
+                                        <option value="">正常</option>
+                                        <option value="">暂停</option>
+                                    </select></td>
+                                <td width="120" align="center"><button type="button" class="btn btn-default">查找</button></td>
+                              </tr>
+                            </table>
+                            </div>
+                            </div>
+                            <div class="panel-body1">
+                            <div class="delete-all">
+                            您最多可创建 <font color="red">4</font> 个标签项目
+                            </div>
+                            <div class="add-user">
+							  <button type="button" class="btn btn-primary">新增标签项目</button>
+                            </div>
+                            </div>
+                            <div class="panel-body">                           
+                            <table class="table">
+                                    <thead>
+                                <tr>
+                                <th width="10%">编号</th>
+                                <th width="23%">项目名称</th>
+                                <th width="26%">数据源</th>
+                                <th width="19%">创建时间</th>
+                                <th width="22%">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                                                              <tr align="center">
+                                          <td>1</td>
+                                          <td>性别标签项目</td>
+                                          <td>淘宝数据源</td>
+                                          <td>2014.04.01</td>
+                                          <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#">暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+                                        </tr> 
+                                    </tbody>
+                                </table>
+                    <div class="mpage">
+                     <div class="col-xs-6">
+                    <div class="dataTables_info">一共 234 条用户信息</div>
+                    </div>
+                    <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ul class="pagination">
+                    <li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>
+                    <li class="paginate_button active" aria-controls="example" tabindex="0"><a href="#">1</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">2</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">3</a></li><li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">4</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">5</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">6</a></li>
+                    <li class="paginate_button next" aria-controls="example" tabindex="0" id="example_next"><a href="#">Next</a></li>
+                    </ul>
+                    </div>
+                    </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>  
+                    </div>
+
+{{end}}

@@ -1,0 +1,12 @@
+{{extend 'layout.html'}}
+{{block plane}}
+<div class="panel-body">
+            <ul class="nano-content">
+            	{{for i,name in  enumerate(data):}}
+                <li class="sub-menu" >
+                    <a id="{{=i}}" href="{{=URL('method_api',vars=dict(name=name))}}"><span>{{=name}} API调用方法</span></a>
+                </li>
+                {{pass}}
+            </ul>
+        </div>
+{{end}}

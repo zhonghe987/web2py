@@ -1,0 +1,22 @@
+﻿{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+基本信息
+项目名称：
+数据源：
+同步标签项：
+已同步标签的cookie量:
+未同步标签的cookie量:
+请选择操作：
+<button type="button"  id='downAll'>下载全部cookie数据</button>
+<button type="button"  id='downIncr'>仅下载未同步的cookie数据</button>
+{{=form}}
+<div id='show'><div>
+<script>
+jQuery(document).ready(function(){
+    jQuery('#downAll').attr('onclick',"location='downAll'");
+    jQuery('#downIncr').attr('onclick',"location='downIncr'");
+
+});
+
+</script>

@@ -1,0 +1,66 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+<div class="panel-body bt-border">
+    <div class="form-horizontal" role="form">
+        <div class="form-title">基本信息</div>
+        {{=form.custom.begin}}
+            <table width="600" border="0" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="right" width="200">标签项目名称：</td>
+                    <td width="200">{{=form.custom.widget.name}}</td>
+                    <td align="left" width="190"  id ="notice"></td>
+                </tr>
+                <tr>
+                    <td align="right" width="155">数据源：</td>
+                    <td width="200">{{=form.custom.widget.source}}</td>
+               </tr>
+        </table>
+    </div>
+</div>
+
+<div class="col-md-12" align="center">
+    {{=form.custom.submit}}
+</div >
+{{=form.custom.end}}     
+                
+<div class="col-md-12" align="center">
+    <button type="submit" class="btn", id='cancel'>取消</button>
+</div>
+{{end}}
+
+{{block script}}
+jQuery('#no_table_name').attr('class','form-control form-input');
+jQuery("#no_table_source option:first ").remove();
+jQuery('#sub').attr('class','btn btn-primary');
+jQuery("#cancel").attr("onclick","location='{{=URL('index')}}'");
+jQuery("#side_tp").attr("id","now-nav");
+jQuery("#sub").click(function(){
+	var tpName = jQuery('#no_table_name').val();
+	if(tpName==""){
+	jQuery('#notice').html('请填写标签项目名称!');
+	return false;
+	}
+});
+jQuery('#no_table_name').blur(function(){
+    var tpName = jQuery('#no_table_name').val();
+    if(tpName!=""){
+        $.ajax({
+            type:"POST",
+            url:"{{=URL('tagProj','tagValit')}}",
+            data:{'uid':{{=auth.user.id}},'tname':tpName},
+            datatype:"json",
+            success:function(data){
+                if (data==0){
+                    jQuery('#notice').html('可以填写!');
+                }else{
+                    jQuery('#notice').html('标签已存在,请更换!')
+                }
+            }
+        });
+    }
+});
+{{end}}

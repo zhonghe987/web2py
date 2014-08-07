@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{=URL('static','assets/img/favicon.ico')}}" type="image/x-icon">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{=URL('static','assets/plugins/bootstrap/css/bootstrap.min.css')}}">
+    <!-- Fonts from Font Awsome -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/font-awesome.min.css')}}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/animate.css')}}">
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/main.css')}}">
+    <!-- table -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/style.css')}}">
+    <!-- <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,900,300italic,400italic,600italic,700italic,900italic' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,700' rel='stylesheet' type='text/css'> -->
+    <!-- Feature detection -->
+    <script src="{{=URL('static','assets/js/modernizr-2.6.2.min.js')}}"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+<body>
+    <section id="container">
+        <header id="header">
+            <!--logo start-->
+            <div class="brand">
+                <a href="#" class="logo"><img src="{{=URL('static','assets/img/logo.png')}}" alt=""/></a>
+            </div>
+            <!--logo end-->
+            <div class="toggle-navigation toggle-left">
+                <button type="button" class="btn btn-default" id="toggle-left" data-toggle="tooltip" data-placement="right" title="隐藏/显示左侧菜单">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+            <div class="user-nav">
+                <ul>
+                    <li class="dropdown settings">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                      欢迎回来，{{=session.user.userName}} <i class="fa fa-angle-down"></i>
+                    </a>
+                        <ul class="dropdown-menu animated fadeInDown">
+                            <li>
+                                <a href="#"><i class="fa"></i>退出系统</a>
+                            </li>
+                        </ul>
+                    </li>
+                       </ul>
+            </div>
+        </header>
+        <!--sidebar start-->
+        <aside class="sidebar">
+            <div id="leftside-navigation" class="nano">
+                <ul class="nano-content">
+                    <li class="sub-menu" id="now-nav">
+                        <a href="#"><span>数据源管理</span><i class="arrow fa fa-angle-right pull-right"></i></a>
+                    </li>
+                <li class="sub-menu">
+                        <a href="{{=URL('tagProj','index')}}">标签项目管理<i class="arrow fa fa-angle-right pull-right"></i></a>
+                    </li> 
+                </ul>
+            </div>
+
+        </aside>
+        <!--sidebar end-->
+        <!--main content start-->
+        {{block index}}{{end}}
+        {{block new}}{{end}}
+        {{block show}}{{end}}
+        
+     <!-- Basic Modal -->
+ <!--Global JS-->
+    
+    <script src="{{=URL('static','assets/js/jquery-1.10.2.min.js')}}"></script>
+    <script src="{{=URL('static','assets/plugins/bootstrap/js/bootstrap.min.js')}}"></script>
+   
+    <script src="{{=URL('static','assets/js/application.js')}}"></script>
+   <script src="{{=URL('static','assets/js/form.js')}}"></script>
+  <script>
+  
+	  jQuery(document).ready(function() {
+	  	jQuery('#no_table_firsttime').attr('class','form-control form-input');
+	  	jQuery('#no_table_firsttime').attr('type','text');
+	  	jQuery('#no_table_lasttime').attr('class','form-control form-input');
+	  	jQuery('#no_table_lasttime').attr('type','text');
+	  	jQuery('#subt').attr('class','btn btn-default');
+	  	jQuery('#subt').click(function(){
+	  		var showa ="数据源保存后只能删除，不能编辑，是否要继续保存？"; 
+	  		var hn=jQuery('#no_table_name').val();
+	  		if(hn){alert(showa);}
+	  		jQuery("#subt").attr("onclick","location='{{=URL('index')}}'");
+	  	});
+	  	jQuery("#go").attr("onclick","location='{{=URL('index')}}'");
+		//jQuery("#datepicker" ).datepicker();
+		//jQuery( "#datepicker1" ).datepicker();
+		jQuery('#checkall').click(function(){
+			alert('s');
+		    if (this.checked) {
+					$("input[name='box']:checkbox").each(function() { 
+					$(this).attr("checked", true);})
+				} else {
+					$("input[name='box']:checkbox").each(function() { 
+								$(this).attr("checked", false);							})
+				}
+			})
+		});
+			
+ /*  jQuery(document).ready(function() {	
+         $('#data_stop').click(function(){
+            var sta =  $('#data_stop').text();
+            var b = "暂停";
+            if(sta == b){
+            	$('#data_stop').text('运行');
+            	
+            }else{
+            	
+            	$('#data_stop').text('云');
+            }
+            window.location.reload();
+                     });
+		}); */
+		</script>
+</body>
+
+</html>

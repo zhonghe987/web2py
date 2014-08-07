@@ -1,0 +1,36 @@
+﻿{{extend 'data_index.html'}}
+
+{{block forms}}
+{{=form.custom.begin}}
+<table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+                              <tr>
+                                <td width="100" align="right">数据源名称：</td>
+                                <td width="160" align="left">{{=form.custom.widget.dataSname}}</td>
+                                <td width="100" align="right">Cookie域名：</td>
+                                <td width="160" align="left">{{=form.custom.widget.cookiedom}}</td>
+                                <td width="50" align="right">状态：</td>
+                                <td width="160" align="left">{{=form.custom.widget.source}}</td>
+                                <td width="120" align="center">{{=form.custom.submit}}</td>
+                              </tr>
+                            </table>
+{{=form.custom.end}}
+
+{{end}}
+
+
+{{block content}}
+{{for da in data:}}
+	<tr align="center">
+    <td><input type="checkbox"></td>
+    <td>{{=da.d_id}}</td>
+    <td>{{=da.dsName}}</td>
+    <td>{{=da.cookieDomain}}</td>
+    <td>{{=da.date}}</td>
+    <td>{{=da.dsStatus}}</td>
+    <td><a href="#">查看</a>&nbsp;&nbsp;<a href="#"  id='data_stop'>暂停&nbsp;&nbsp;<a href="#">删除</a></td>
+    </tr> 
+    {{pass}}
+{{end}}                                                                     
+
+
+

@@ -1,0 +1,139 @@
+#coding:utf8
+
+
+LIMIT = 10
+def index():
+    dicts={}
+    tagCount = letv_db(letv_db.tagSource.t_id > 0).count()
+    classCount = letv_db(letv_db.midClass.cr_id > 0).count()
+    all_rows = [k.date for k in letv_db().select(letv_db.tagLog.date,groupby= ~letv_db.tagLog.date )]
+    for ke in all_rows[0:2]:
+        dicts[ke] = [ d.userId for d in letv_db(letv_db.tagLog.date == ke).select(letv_db.tagLog.userId)]
+    
+    breadcrumb = ['首页']
+    return dict(breadcrumb = breadcrumb,tag_num = tagCount,tag_class = classCount)
+
+def tagManage():
+    import math
+    breadcrumb = ['标签管理']
+    bigClass = [(name.l_id,name.bigName) for name in letv_db().select(letv_db.bigClass.l_id,letv_db.bigClass.bigName) ]
+    midClass = [(name.cr_id,name.midName) for name in letv_db().select(letv_db.midClass.cr_id,letv_db.midClass.midName) ]
+    btn = INPUT(_value='搜索',_type='submit',_id='subt')
+    form = form = SQLFORM.factory(
+                                  Field('name',requires =  IS_NOT_EMPTY()),
+                                  Field('big',requires = IS_IN_SET(bigClass)),
+                                  Field('mid',requires = IS_IN_SET(midClass)),
+                                  buttons = [btn]
+                                  )
+    csdn =()
+    if form.accepts(request, session):
+        if  request.vars.name:
+            csdn  = csdn & (letv_db.tagSource.tagName == request.vars.name)
+            dataCount = letv_db(csdn).count()
+            pagCount  = int(math.ceil(dataCount / LIMIT))
+        if  request.vars.big:
+            csdn = csdn & (letv_db.tagSource.bigClass_id == request.vars.big)
+            dataCount = letv_db(csdn).count()
+            pagCount  = int(math.ceil(dataCount / LIMIT))
+        if request.vars.mid:
+            csdn = csdn & (letv_db.tagSource.midClass_id == request.vars.mid)
+            dataCount = letv_db(csdn).count()
+            pagCount  = int(math.ceil(dataCount / LIMIT))
+    bigClassData = letv_db(letv_db.bigClass).select(letv_db.bigClass.id, letv_db.bigClass.bigName)
+    midClassData = letv_db(letv_db.midClass).select(letv_db.midClass.id, letv_db.midClass.midName)
+    tagData = letv_db(letv_db.tagSource).select(letv_db.tagSource.id, letv_db.tagSource.tagName,letv_db.tagSource.createDate,
+                                                                                             letv_db.bigClass.bigName,letv_db.midClass.midName,
+                                                                                             join=[letv_db.bigClass.on(letv_db.bigClass.id==letv_db.tagSource.bigClass_id),
+                                                                                                        letv_db.midClass.on(letv_db.midClass.id==letv_db.tagSource.midClass_id)],
+                                                                                             )
+    count = len(tagData)
+    pagCount = int(math.ceil(count / LIMIT))
+    return dict(breadcrumb = breadcrumb,
+                          form = form ,
+                          bigClassData = bigClassData,
+                          midClassData = midClassData,
+                          tagData = tagData,
+                          pagCount = pagCount,
+                          count = count)
+
+def splitPage():
+    tagCount = (int(request.vars.count) - 1) * LIMIT
+    csdn =()
+    if  request.vars.name:
+            csdn  = csdn & (letv_db.tagSource.tagName == request.vars.name)
+    if  request.vars.big: 
+            csdn = csdn & (letv_db.tagSource.l_id == request.vars.big)
+    if request.vars.mid:
+            csdn = csdn & (letv_db.tagSource.l_id == request.vars.mid)
+    data = letv_db(csdn).select(orderby = letv_db.tagSource.t_id,limitby=(tagCount,tagCount + LIMIT))
+    import gluon.contrib.simplejson
+    return response.json(dict(data = data))
+
+
+        
+def  tagEdit():
+    #print request.vars
+    all_data = ['媒资ID','视频名称','企业名称','联系人']
+    breadcrumb = ['标签管理','新增标签']
+    bigData = ([items.bigName for items in letv_db().select(letv_db.bigClass.bigName,letv_db.bigClass.l_id,orderby = letv_db.bigClass.l_id)])
+    midData = ([items.midName for items in letv_db().select(letv_db.midClass.midName,letv_db.midClass.cr_id,orderby = letv_db.midClass.cr_id)])
+    bigData.insert(0,'请选择')
+    midData.insert(0,'请选择')
+    big = SELECT(bigData,_class="form-control",_id="big",_name="big_class")
+    mid = SELECT(midData,_class="form-control",_id="mid",_name="mid_class")
+    all = SELECT(all_data,_id="alls",_name="all")
+    dictData = {}
+    for key in request.vars:
+       dictData[key] = request.vars[key]
+    data = genserat(dictData)
+
+    if data:
+        bigId = letv_db(letv_db.bigClass.bigName == dictData['big_class']).select(letv_db.bigClass.l_id)
+        midId = letv_db(letv_db.midClass.midName == dictData['mid_class']).select(letv_db.midClass.cr_id)
+        if request.vars.tagname:
+            letv_db.tagSource.insert(tagName =dictData['tagname'],bigClass_id=bigId[0],midClass_id=midId[0])
+            tagId = letv_db(letv_db.tagSource.tagName == dictData['tagname']).select(letv_db.tagSource.t_id)
+        
+        for v in data.values():
+            letv_db.ruleGroup.insert(tag_id = tagId[0])
+            ruleGroupId = letv_db().select(letv_db.ruleGroup.rg_id,orderby = ~letv_db.ruleGroup.rg_id )
+            for k in v:
+                letv_db.rules.insert(col_name = k[0],condition_op = k[1],content  = k[2])
+                rule_id = letv_db((letv_db.rules.col_name == k[0]) & (letv_db.rules.condition_op == k[1]) &(letv_db.rules.content == k[2])).select(letv_db.rules.r_id)
+                letv_db.ruleFilterGroup.insert(rules_id = rule_id[0],ruleGroup_id = ruleGroupId[0])
+
+        redirect(URL('tagManage','tagManage'))
+    
+    return dict(breadcrumb = breadcrumb,select_big = big,midData = mid,all = all)
+'''
+
+'''
+def genserat(dicts):
+    strs = []
+    bao = []
+    fill = [] 
+    for key in dicts.keys():  
+        #print '====',key   
+        if 'strsdiv'  in key  and key.find('strsdiv') == 0: 
+            strs.append(key)
+        if 'baodiv' in key and key.find('baodiv') == 0:   
+            bao.append(key)
+        if 'filldiv' in  key and key.find('filldiv') == 0 :
+            fill.append(key)
+    strs = sorted(strs)
+    bao = sorted(bao)
+    fill = sorted(fill)
+    listKeys = zip(strs,bao,fill)
+    data = {}
+    for i,key in enumerate(listKeys):
+            s = dicts[key[0]]
+            b = dicts[key[1]]
+            f = dicts[key[2]]
+            if isinstance(s, list):
+                data[i] = zip(s,b,f)
+            else:
+                data[i] = [(s,b,f)]
+    return  data
+         
+
+

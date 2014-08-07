@@ -1,0 +1,119 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+
+{{end}}
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="table-control">
+                    {{=form.custom.begin}}
+                    <table width="900" class="bq">
+                        <tr>
+                            <td width="10%" align="right">关键字：</td>
+                            <td width="20%" align="left">{{=form.custom.widget.keyname}}</td>
+                            <td width="10%" align="right">大类别：</td>
+                            <td width="20%" align="left">{{=form.custom.widget.big}}</td>
+                            <td width="10%" align="right">小类别：</td>
+                            <td width="20%" align="left">{{=form.custom.widget.mid}}</td>
+                            <td width="10%" align="center">{{=form.custom.submit}}</td>
+                        </tr>
+                    </table>
+                    {{=form.custom.end}}
+                </div>
+            </div>
+
+            <div class="panel-body1">
+                <div class="delete-all">
+                    已创建 <font color="red">{{=bigClassCount}}</font> 个大类别， 
+                                <font color="red">{{=midClassCount}}</font> 个小类别
+                </div>
+                <div class="add-user">
+                    <a href="{{=URL('tagClassManage','edit')}}"> <button type="button" class="btn btn-primary">新增标签类别</button></a>
+                </div>
+            </div>
+
+            <div class="panel-body">                           
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th width="10%">编号</th>
+                            <th width="23%">标签类别</th>
+                            <th width="26%">所属父类别</th>
+                            <th width="22%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ for i, r in enumerate(bigClassData):}}
+                        <tr align="center">
+                            <td>{{=i+1}}</td>
+                            <td>{{=r.bigName}}</td>
+                            <td>--</td>
+                            <td><a href="#">编辑</a>&nbsp;&nbsp;<a href="#" onclick = "tagDele({{=r.l_id}},'0')">删除</a></td>
+                        </tr> 
+                        {{pass}}
+                        {{ for i, r in enumerate(midClassData):}}
+                        <tr align="center">
+                            <td>{{=i+1+bigClassCount}}</td>
+                            <td>{{=r.midClass.midName}}</td>
+                            <td>{{=r.bigClass.bigName}}</td>
+                            <td><a href="#">编辑</a>&nbsp;&nbsp;<a href="#" onclick = "tagDele('0',{{=r.midClass.cr_id}})">删除</a></td>
+                        </tr> 
+                        {{pass}}                       
+                    </tbody>
+                </table>
+
+                <div class="mpage">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info">共 {{=bigClassCount+midClassCount}} 条信息</div>
+                    </div>
+                    <!--<div class="col-xs-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ul class="pagination">
+                    <li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>
+                    <li class="paginate_button active" aria-controls="example" tabindex="0"><a href="#">1</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">2</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">3</a></li><li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">4</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">5</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">6</a></li>
+                    <li class="paginate_button next" aria-controls="example" tabindex="0" id="example_next"><a href="#">Next</a></li>
+                    </ul>
+                    </div>
+                    </div>-->
+                </div>
+            </div>
+        </div>
+    </div>  
+</div>
+{{end}}
+
+{{block script}}
+   jQuery('#no_table_keyname').attr('class','form-control form-input');
+   jQuery('#no_table_big').attr('class','form-control form-input');
+   jQuery('#no_table_big option:first').remove();
+   jQuery('#no_table_mid').attr('class','form-control form-input');
+   jQuery('#no_table_mid option:first').remove();
+{{end}}
+{{block script func}}
+function tagDele(id,tag){
+	$.ajax({
+		type:"post",
+		url:"{{=URL('tagClassManage','classDelete')}}",
+		data:{'id':id,'tag':tag},
+		dataType:"json",
+		success:function(data){
+			if (data == 303){
+				alert('请先删除标签类别所关联的标签！');
+			}else{
+				 window.location.reload();
+			}
+			
+		}
+	});
+}
+{{end}}
+

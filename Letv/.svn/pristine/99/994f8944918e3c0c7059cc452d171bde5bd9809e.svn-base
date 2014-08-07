@@ -1,0 +1,91 @@
+from gluon.scheduler import Scheduler
+ 
+sch_db = DAL('mysql://idexadmin:idex000@180.169.19.150/Letv')
+
+
+def __containOr(param,data):
+    #print 'Contain param:%s, data:%s' %(param, data)
+    for p in param:
+        if data.find(p) > -1:
+            return True
+    return False
+
+def __notContainAnd(param, data):
+    for p in param:
+        if data.find(p) > -1:
+            return False
+    return True
+
+
+OP = dict(containOr=__containOr,
+                    notContainAnd=__notContainAnd)
+ 
+def __getTagRules():
+    tagRules = {}
+    tags = letv_db().select(letv_db.tagSource.ALL)
+    for t in tags:
+        group = letv_db(letv_db.ruleGroup.tag_id==t.id).select()
+        gl = []
+        for g in group:
+            rules = letv_db(letv_db.ruleFilterGroup.ruleGroup_id==g.id).select()
+            rl = []
+            for r in rules:
+                re = letv_db(letv_db.rules.id == r.rules_id).select().first()
+                rl.append(dict(col=re.field_col,param=tuple([s for s in re.content.split(',') if s !='']), op=re.condition_op))
+            gl.append(tuple(rl))
+        tagRules[t.tagName] = dict(tagId=t.id, ruleGroup=tuple(gl))
+    return tagRules
+
+def __tagProcess(tagRules, data):
+    t = []
+    c = len(data)
+    for tag, obj in tagRules.items():
+        #print tag 
+        for rules in obj['ruleGroup']:            
+            for r in rules:
+                if r['col'] < c:
+                    bRule = OP[r['op']](r['param'],data[r['col']])
+                else:
+                    bRule = False
+                if not bRule: # 规则返回False, 退出本组规则
+                    break
+            if bRule: # 本组True，退出标签检查
+                t.append(dict(tag=tag, tagId=obj['tagId'], userId=data[0]))
+                break
+    return t
+
+
+def __tagProcessTask(filename, savefile):
+    import csv
+    import sys
+    import os
+    import time
+    csv.field_size_limit(10000000)
+
+    b = time.time()
+    tagRules = __getTagRules()
+    f = open(filename,'rU')
+    f.readline()
+    reader = csv.reader(f,quoting=csv.QUOTE_NONE)
+    data = []
+    for line in reader:
+            r = __tagProcess(tagRules, line)
+            if r:
+                data.extend(r)
+    
+    e = time.time()
+    f.close()
+    f = open(savefile,'w')
+    f.writelines(['%s-%s-%d\n' %(d['userId'],d['tag'],d['tagId']) for d in data])
+    f.close()
+    for userId,_,tagId in data:
+        letv_db.tagLog.insert(userId=userId, tagId=tagId)
+    letv_db.commit()
+    return 'all time: %f, data len: %d, csv line: %d' %((e-b), len(data), reader.line_num)
+ 
+tasks = dict(tagProcess=__tagProcessTask
+)
+ 
+scheduler = Scheduler(sch_db, tasks)
+    
+

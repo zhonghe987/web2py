@@ -1,0 +1,68 @@
+def interface_api():
+    data = ['tagCount','data','count','noTagCount','infos']
+    f = dict(breadcrumb=['API文档'],panelTitle='API调用方法',data= data)
+    return f
+
+def method_api():
+    f = dict(breadcrumb=['API文档'])
+    if request.vars.name == "data":
+        f['panelTitle']='data API调用方法'
+        f['inter']='用于获取所有的数据'
+        f['url'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/data?'
+        f['args']='name=yu'
+        f['format']= '参数的数据格式为： k1=v1 '
+        f['https'] ='get'
+        f['example'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/data?name=yu'
+        f['json']='{"msg": "", "data": [], "errcode": 0, "ret": 0}'
+        f['args_name']='标签工程的名称'
+        return f
+    elif request.vars.name == "count":
+        f['panelTitle']='count API调用方法'
+        f['inter']='用于获取所有的cookie量'
+        f['url'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/count?'
+        f['args']='name=yu'
+        f['format']= '参数的数据格式为： k1=v1 '
+        f['https'] ='get'
+        f['example']='http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/count?name=yu'
+        f['args_name']='标签工程的名称'
+        f['json']='{"msg": "", "data": {"count": 49866, "act": "count"}, "errcode": 0, "ret": 0}'
+        return f
+    elif request.vars.name == "tagCount":
+        f['panelTitle']='tagCount API调用方法'
+        f['inter']='用于获取已标记的cookie量'
+        f['url'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/tagCount?'
+        f['args']='name=yu'
+        f['format']= '参数的数据格式为： k1=v1 '
+        f['https'] ='get'
+        f['example'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/tagCount?name=yu'
+        f['args_name']='标签工程的名称'
+        f['json']='{"msg": "", "data": {"count": 7, "act": "tagCount"}, "errcode": 0, "ret": 0}'
+        return f
+    elif request.vars.name == "noTagCount":
+        f['panelTitle']='noTagCount API调用方法'
+        f['inter']='用于获取未标记的cookie量'
+        f['url'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/noTagCount?'
+        f['args']='name=yu'
+        f['format']='参数的数据格式为： k1=v1 '
+        f['example']='http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/noTagCount?name=yu'
+        f['https'] ='get'
+        f['args_name']='标签工程的名称'
+        f['json']='{"msg": "", "data": {"count": 49859, "act": "noTagCount"}, "errcode": 0, "ret": 0}'
+        return f
+    elif request.vars.name == "infos":
+        f['panelTitle']='infos API调用方法'
+        f['inter']='获取数据的信息'
+        f['url'] = 'http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/infos?'
+        f['args']='name=yu'
+        f['format']= '参数的数据格式为： k1=v1 '
+        f['https'] ='get'
+        f['example']='http://127.0.0.1:8000/LinkDataAdmin/api/tagProj/infos?name=yu'
+        f['json']='{"msg": "", "data": [{"cookieDomain": "www.qq.com", "dataSourceName": "qq", "createDate": "2014-05-26 10:28:48", "name": "yu"}, {"cookieDomain": "www.qq.com", "dataSourceName": "qq", "createDate": "2014-05-27 10:22:48", "name": "yus"}, {"cookieDomain": "www.qq.com", "dataSourceName": "qq", "createDate": "2014-05-27 10:18:34", "name": "wer"}, {"cookieDomain": "www.qq.com", "dataSourceName": "qq", "createDate": "2014-05-27 10:18:30", "name": "ewrw"}], "errcode": 0, "ret": 0}'
+        f['args_name']='标签工程的名称'
+        return f
+    
+    
+    
+    
+    return f
+    

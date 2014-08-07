@@ -1,0 +1,8 @@
+﻿{{ extend 'layout.html'}}
+{{include 'leftSide.html'}}
+
+
+数据源管理
+{{=form}}
+<button type="button">批量删除</button>
+<button type="button" onclick="location.href='{{=URL('new')}}'">新增数据源</button>

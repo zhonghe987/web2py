@@ -1,0 +1,145 @@
+# -*- coding: utf-8 -*-
+
+
+def index():
+    s = [('all','全部')]
+    s.extend([(d.id,'%s (%s)' %(d.dsName,d.cookieDomain)) for d in lda_db(lda_db.dataSource.account_id == session.user.id).select()])
+    btn = INPUT(_value='搜索',_type='submit',_id='sub')
+    form = SQLFORM.factory(Field('name', requires=IS_NOT_EMPTY()),
+                                                      Field('source',requires=IS_IN_SET(s)),
+                                                      buttons = [btn]
+                  )
+    data = lda_db((lda_db.tagProj.account_id==session.user.id) & (lda_db.tagProj.tpStatus!='delete')).select(lda_db.tagProj.id,lda_db.tagProj.tpName,lda_db.tagProj.tpStatus,lda_db.tagProj.date,
+                                                                                                                                                                                                                  lda_db.dataSource.dsName,lda_db.dataSource.cookieDomain,lda_db.dataSource.id,
+                                                                                                                                                                                                                  join=lda_db.dataSource.on(lda_db.tagProj.id==lda_db.dataSource.id))
+    if form.accepts(request, session):
+        response.flash = 'data accepted'
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form -> %s' %session.user
+    return dict(form=form, panelTitle='标签项目管理', data=data)
+
+def new():
+    dataSource = lda_db(lda_db.dataSource.account_id==session.user.id).select()
+    options = [(ds.id, '%s (%s)' %(ds.dsName,ds.cookieDomain)) for ds in dataSource]
+    btn = INPUT(_type='submit', _value='保存',_id='sub')
+    form = SQLFORM.factory(Field('name', requires=IS_NOT_EMPTY()),
+                                                      Field( 'source', requires = IS_IN_SET(options)),
+                                                      buttons = [btn]
+                )
+
+    if form.accepts(request, session):
+        print 'vars->',form.vars
+        r = lda_db.tagProj.insert(account_id=session.user.id, dataSource_id=form.vars.source, tpName=form.vars.name)
+        lda_db.executesql("CREATE TABLE Tag_%s (ds_id int, ti_id int DEFAULT '0', cookieId varchar(45), primary key (ds_id)) engine=MyISAM DEFAULT CHARSET=utf8" %r)
+        lda_db.executesql('CREATE TABLE TagItem_%s (ti_id int, count int, value varchar(45), date datetime, primary key (ti_id)) engine=MyISAM DEFAULT CHARSET=utf8' %r)
+        lda_db.define_table('Tag_%s' %r, Field('ds_id','id'),Field('ti_id','integer'))
+        lda_db.define_table('TagItem_%s' %r, Field('ti_id','id'), Field('value'), Field('date','datetime'))
+        lda_db.executesql("INSERT INTO Tag_%s(ds_id,cookieId) SELECT ds_id,cookieId FROM DS_%s" %(r,form.vars.source))
+        #response.flash = 'data accepted -> %s' %0
+    elif form.errors:
+        response.flash = 'form has errors'
+    else:
+        response.flash = 'please fill the form -> %s' %options
+
+    return dict(form=form)
+
+
+def sync():
+    dsId = request.vars.dsId
+    tpId = request.vars.tpId
+    tagProj = lda_db(lda_db.tagProj.id==tpId).select().first()
+    session.tagProj = tagProj
+    ds = lda_db(lda_db.dataSource.id==dsId).select().first()
+    session.dataSource = ds
+    maxId = lda_db.executesql('SELECT max(ds_id) FROM Tag_%s' %tpId)[0][0]
+    lda_db.executesql("INSERT INTO Tag_%s(ds_id,cookieId) SELECT ds_id,cookieId FROM DS_%s WHERE ds_id > %d" %(tpId,dsId,maxId))
+    allCount = lda_db.executesql('SELECT count(ds_id) FROM Tag_%s' %tpId)[0][0]
+    noCount = lda_db.executesql('SELECT count(ds_id) FROM Tag_%s WHERE ti_id=0' %tpId)[0][0]
+    btn = INPUT(_value='上传已标记的cookie数据', _type='submit', _id='sub')
+    import os
+    cvs_form = SQLFORM.factory( Field('filename', 'upload',uploadfolder=os.path.join(request.folder,'uploads')),
+                                                               buttons = [btn]
+                          )
+    if cvs_form.accepts(request, formname='cvs_form'):
+        response.flash = 'file upload: %s' %cvs_form.vars
+        if cvs_form.vars.filename:
+            p = os.path.join(request.folder,'uploads')
+            #response.flash = p+cvs_form.vars.filename
+            import datetime
+            import csv
+            fn = os.path.join(p,'cookiesChecked-%s-%s-%s.csv' %(session.user.id,session.tagProj.id,datetime.datetime.now().strftime("%Y%m%d%H%M%S")))
+            os.rename(os.path.join(p,cvs_form.vars.filename), fn)
+            f = open(fn, 'r')
+            f.readline()
+            reader = csv.reader(f)
+            projId = session.tagProj.id
+            value = dict((v,i) for i,v in lda_db.executesql("SELECT ti_id,value FROM TagItem_%s" %projId))
+            maxId = lda_db.executesql("SELECT max(ti_id) FROM TagItem_%s" %projId)[0][0]
+            if not maxId:
+                maxId = 0
+            print value, maxId
+            data = []
+            for id, _, v in reader:
+                if v == 'None':
+                    continue
+                v = v.decode('GBK')
+                ti = value.get(v, None)
+                if ti:
+				    data.append('(%s,%d)' %(id,ti))
+                else:
+                    maxId += 1
+                    value[v] = maxId
+                    print "INSERT INTO TagItem_%s (ti_id,value) VALUES (%d,'%s')" %(projId,maxId,v)
+                    lda_db.executesql("INSERT INTO TagItem_%s (ti_id,value) VALUES (%d,'%s')" %(projId,maxId,v))
+                    data.append('(%s,%d)' %(id,maxId))
+            i = 0
+            c = len(data)
+            print 'len data:', len(data)
+            while i < c:
+                s = ','.join(data[i:i+5000])
+                lda_db.executesql("INSERT INTO Tag_%s (ds_id,ti_id) VALUES %s ON DUPLICATE KEY UPDATE ti_id=values(ti_id)" %(projId, s))
+                i += 5000
+                    
+    else:
+        response.flash = 'error'
+    return dict(form=cvs_form, tagProjName=tagProj.tpName, 
+                          dataSource='%s (%s)' %(ds.dsName,ds.cookieDomain),
+                          counted=allCount-noCount, noCount=noCount)
+
+
+def downAll():
+    import os
+    import datetime
+    import csv
+    data = lda_db.executesql("SELECT ds_id,cookieId FROM Tag_%s" %session.tagProj.id)   
+    filename = 'cookiesAll-%s.csv' %datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    path = os.path.join(request.folder, 'private', filename)
+    f = open(path,"wb")
+    writer = csv.writer(f)
+    writer.writerow(['id','cookies','value'])
+    for i,c in data:
+        writer.writerow([i,c,'None'])
+    f.close()
+    response.headers['Content-type'] = 'application/octet-stream'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' %filename
+    return response.stream(open(path), chunk_size=4096)
+
+
+def downIncr():
+    import os
+    import datetime
+    import csv
+    data = lda_db.executesql("SELECT ds_id,cookieId FROM Tag_%s WHERE ti_id=0" %session.tagProj.id)   
+    filename = 'cookiesIncr-%s.csv' %datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+    path = os.path.join(request.folder, 'private', filename)
+    f = open(path,"wb")
+    writer = csv.writer(f)
+    writer.writerow(['id','cookies','value'])
+    for i,c in data:
+        writer.writerow([i,c,'None'])
+    f.close()
+    response.headers['Content-type'] = 'application/octet-stream'
+    response.headers['Content-Disposition'] = 'attachment; filename=%s' %filename
+    return response.stream(open(path), chunk_size=4096)

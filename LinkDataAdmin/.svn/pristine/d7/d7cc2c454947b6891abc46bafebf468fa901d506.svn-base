@@ -1,0 +1,58 @@
+{{header_enabled=False}}
+{{sidebar_enabled=False}}
+
+{{ extend "layout.html"}}
+
+{{block container}}
+<style>
+div.error{
+	color:red;
+}
+</style>
+<section id="login-container">
+    <div class="row">
+        <div class="col-md-3" id="login-wrapper">
+            <div class="panel panel-primary animated flipInY">
+                <div class="panel-heading">
+                    <h3 class="panel-title">登录</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal" role="form">
+                    {{=form.custom.begin}}
+                        <div class="form-group">
+                        	<div class='error'>{{=err}}</div>
+                            <div class="col-md-12">
+                                {{=form.custom.widget.user}}
+                                <i class="fa fa-user"></i>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                {{=form.custom.widget.pwd}}
+                                <i class="fa fa-lock"></i>
+                                <a href="javascript:void(0)" class="help-block">忘记密码?</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                            {{=form.custom.submit}}
+                            </div>
+                        </div>
+                    {{=form.custom.end}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{{end}}
+
+{{block script}}
+jQuery('#no_table_pwd').attr('class','form-control');
+jQuery('#no_table_pwd').attr('placeholder','密码');
+jQuery('#no_table_pwd').attr('type','password');
+jQuery('#no_table_user').attr('class','form-control');
+jQuery('#no_table_user').attr('placeholder','用户名');
+jQuery('#no_table_user').attr('type','user');
+jQuery('#subl').attr('class','btn btn-primary btn-block');
+{{end}}

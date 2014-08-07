@@ -1,0 +1,141 @@
+{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+
+<div class="panel-body bt-border">
+    <div class="form-horizontal" role="form">
+        <div class="form-title">基本信息</div>
+        {{=form.custom.begin}}                               
+        <table width="600" border="0" cellspacing="0" cellpadding="0">
+            <tr>
+            <td width="150" align="right">源配置名称：</td>
+            <td width="200">{{=form.custom.widget.confName}}</td>
+            <td align="left" width="200" id='su'></td>
+            </tr>
+            <tr>
+            	  <td width="150" align="right">数据库引擎：</td>
+                 <td width="200">{{=form.custom.widget.dbEngine}}</td>
+                  <td align="left" id='engine'></td>
+            </tr>
+            <tr>
+            	<td width="150" align="right">状态：</td>
+                 <td width="200">{{=form.custom.widget.status}}</td>
+                  <td align="left" id='status'></td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+<div class="panel-body bt-border">
+    <div class="form-horizontal" role="form">
+        <div class="form-title">数据库信息</div>
+        <table width="700" border="0" cellspacing="0" cellpadding="0">
+            <tr>    
+         	
+                 <td width="150" align="right">用户名：</td>
+                 <td width="200" >{{=form.custom.widget.dbUser}}</td>
+                 <td width="150" align="right">密码：</td>
+                 <td width="200" >{{=form.custom.widget.dbPwd}}</td>
+                
+            </tr>
+            <tr>
+                 <td width="150" align="right">IP地址：</td>
+                 <td width="200" >{{=form.custom.widget.host}}</td>
+                 <td width="150" align="right">端口号：</td>
+                 <td width="200" >{{=form.custom.widget.port}}</td>
+            </tr>
+            <tr>
+                 <td width="150" align="right">数据库名称：</td>
+                 <td width="200">{{=form.custom.widget.dbName}}</td>
+                 <td width="150" align="right">表名称：</td>
+                 <td width="200">{{=form.custom.widget.tableName}}</td>
+                 
+            </tr>
+        </table>                                    
+    </div>                                
+</div>
+ <div id="add"  style="margin-top:10px;" class="col-md-12" align="center">
+	{{=form.custom.submit}}
+    
+
+</div>
+{{=form.custom.end}}
+
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div class="modal-body">
+                   
+                </div>
+                <div class="modal-footer">
+                   
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+
+{{block script}}
+
+jQuery('#no_table_confName').attr('class','form-control');
+jQuery('#no_table_dbEngine').attr('class','form-control');
+jQuery('#no_table_host').attr('class','form-control');
+jQuery('#no_table_port').attr('class','form-control');
+jQuery('#no_table_dbName').attr('class','form-control');
+jQuery('#no_table_tableName').attr('class','form-control');
+jQuery('#no_table_status').attr('class','form-control');
+jQuery('#no_table_dbUser').attr('class','form-control');
+jQuery('#no_table_dbPwd').attr('class','form-control');
+jQuery('#no_table_dbEngine option').first().remove();
+jQuery('#no_table_status option').first().remove();
+jQuery("#subt").attr('class','btn btn-primary');
+jQuery('#add div').append('&nbsp;&nbsp;&nbsp;&nbsp;<button type="submit" id= "go" class="btn" >取消 </button>');
+jQuery("#go").click(function(){
+	window.location.href = "{{=URL('orignalData','orignalIndex')}}";
+});
+jQuery('#no_table_status').blur(function(){
+	var st = $("#no_table_status").val();
+	if(st =="yes"){
+		$.ajax({
+		type:"post",
+		url:"{{=URL('orignalData','getStatus')}}",
+		data:{'statu':'yes'},
+		dataType:"json",
+		success:function(data){
+			//alert(data.data);
+			if(data.data == 1){
+				$('div[class = "modal-body"] div').remove();
+				$('#status').attr('data-toggle','modal');
+				$('#status').attr('data-target','#basicModal');
+	            $('#status').click();
+				$('div[class="modal-body"]').append('<div>已有一个数据源配置正在使用中。若想使用当前的数据源配置，请变更已使用数据源配置的状态为    "不选中"！</div>');
+			}
+		}
+	});
+	}
+});
+
+jQuery('#subt').click(function(){
+	var name=$('#no_table_confName').val();
+	var user=$('#no_table_dbUser').val();
+	var pwd=$('#no_table_dbPwd').val();
+	var host=$('#no_table_host').val();
+	var port=$('#no_table_port').val();
+	var dbname=$('#no_table_dbName').val();
+	var table=$('#no_table_tableName').val();
+	if(name == '' &&  user=='' && pwd == '' && host == '' && port== '' && dbname == '' && table == '' ){
+		return false;
+	}
+});
+
+
+{{end}}

@@ -1,0 +1,214 @@
+﻿{{header_enabled=True}}
+{{sidebar_enabled=True}}
+
+{{extend 'layout.html'}}
+
+{{block plane}}
+<div class="panel-body">
+    <div class="tab-wrapper tab-primary">
+        <ul class="nav nav-tabs">
+            <li class="{{=home}}"><a href="#home1" data-toggle="tab">数据源信息</a></li>
+            <li class="{{=profile}}"><a href="#profile1" data-toggle="tab">活跃cookie统计</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="{{=homes}}" id="home1">
+                <div class="panel-body bt-border">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-title">基本信息</div>
+                        <table width="400" border="0" cellspacing="0" cellpadding="0">
+                            <tr>
+                                <td align="right" width="155">数据源名称：</td>
+                                <td width="245">{{=data.dsName}}</td>
+                            </tr>
+                            <tr>
+                                <td align="right" width="155">Cookie域：</td>
+                                <td width="245">{{=data.cookieDomain}}</td>
+                             </tr>
+                        </table>
+                    </form>
+                </div>
+                <div class="panel-body">
+                    <div class="form-horizontal" role="form">
+                    <div class="form-title">KeyName信息</div>
+                        <table width="700" border="0" cellspacing="0" cellpadding="0">
+                            {{ for i,kv in enumerate(data.keyNames):}}
+                            <tr>
+                                <td align="right" width="155">KeyName{{=i+1}}：</td>
+                                <td width="192">{{=kv[0]}}</td>
+                                <td align="right" width="71">值长度：</td>
+                                <td width="198">{{=kv[1]}}</td>
+                            </tr>
+                            {{pass}}
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="{{=profs}}" id="profile1">
+                <div class="panel-body">
+                    <div class="table-control">
+                        <div class="bq">
+                        {{=form.custom.begin}}
+                            <table width="640" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td width="70" align="right">时间范围：</td>
+                                    <td width="140" align="left">{{=form.custom.widget.firsttime}}</td>
+                                    <td align="center" width="10">至&nbsp;&nbsp;&nbsp;</td>
+                                    <td width="150">{{=form.custom.widget.lasttime}}</td>
+                                    <td width="120">{{=form.custom.submit}}</button></td>
+                              </tr>
+                            </table>
+                            {{=form.custom.end}}
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body">                           
+                    <table class="table" >
+                        <thead>
+                            <tr align="left">
+                                <th>时间</th>
+                                <th>活跃cookie数（个）</th>
+                            </tr>
+                         </thead>
+                         <tbody id="tblCook" ds_id="{{=ds_id}}" startDate='' endDate=''>
+                         {{for ks in cookData:}}
+                             <tr align="left">
+                                 <td>{{=ks.date}}</td>
+                                 <td>{{=ks.count}}</td>
+                             </tr> 
+                         {{pass}}
+                        </tbody>
+                    </table>
+                    <div class="mpage">
+                        <div class="col-xs-6">
+                            <div class="dataTables_info">共{{=cookCount}}条信息</div>
+                        </div>
+                        <div class="col-xs-6">
+                            <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                                <ul class="pagination">
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-12" align="center">
+        <a  href="{{=URL('index')}}"><button type="submit" class="btn">返回</button></a>
+    </div>
+</div>                       
+{{end}}
+ 
+{{block script}}
+jQuery('#no_table_firsttime').attr('class','form-control form-input');
+jQuery('#no_table_firsttime').attr('type','text');
+jQuery('#no_table_lasttime').attr('class','form-control form-input');
+jQuery('#no_table_lasttime').attr('type','text');
+jQuery('#no_table_firsttime').datepicker();
+jQuery('#no_table_lasttime').datepicker();
+jQuery(function($){                   
+$.datepicker.regional['zh-CN'] = { 
+                      closeText: '关闭',  
+					  prevText: '<上月',                      
+					  nextText: '下月>', 
+                      currentText: '今天',                   
+					  monthNames: ['一月','二月','三月','四月','五月','六月', 
+                      '七月','八月','九月','十月','十一月','十二月'],          
+					  monthNamesShort: ['一','二','三','四','五','六','七','八','九','十','十一','十二'],                  
+					  dayNames: ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'],
+					  dayNamesShort: ['周日','周一','周二','周三','周四','周五','周六'],    
+					  dayNamesMin: ['日','一','二','三','四','五','六'],              
+					  weekHeader: '周',              
+					  dateFormat: 'yy-mm-dd',  
+					  firstDay: 1,              
+					  isRTL: false,            
+					  showMonthAfterYear: true,               
+					  yearSuffix: '年'};         
+					  $.datepicker.setDefaults($.datepicker.regional['zh-CN']); 
+});
+jQuery("#sub").attr('class','btn btn-primary');
+jQuery("#subt").attr('class','btn btn-primary');
+jQuery("#side_ds").attr("id","now-nav");
+jQuery('#subt').attr('class','btn btn-default');
+jQuery('#subt').click(function(){
+            var showa ="数据源保存后只能删除，不能编辑，是否要继续保存？"; 
+            var hn=jQuery('#no_table_name').val();
+            if(hn){alert(showa);}
+            jQuery("#subt").attr("onclick","location='{{=URL('index')}}'");
+});
+jQuery("#go").attr("onclick","location='{{=URL('index')}}'");
+jQuery('#sub').addClass("btn-primary");
+jQuery('#sub').click(function(e){
+    e.preventDefault();
+    var startDate = jQuery('#no_table_firsttime').val();
+    var endDate = jQuery('#no_table_lasttime').val();
+    tbl = jQuery("#tblCook");
+    tbl.attr('startDate', startDate);
+    tbl.attr('endDate', endDate);
+    $.ajax({
+        type: "post",
+        url: "{{=URL('cookFind')}}",
+        data: {"dsId":jQuery("#tblCook").attr("ds_id"),"startDate":startDate,"endDate":endDate},
+        dataType: "json",
+        success: function(data){//成功时执行函数
+            //alert('dc->'+data.cookCount);
+            createPagination(data.pageCount);
+            createCookTable(data.cookData);
+            jQuery(".dataTables_info").text('共'+data.cookCount+'条信息');
+        }
+    });
+});
+
+createPagination({{=pageCount}});
+{{end}}
+
+{{block script func}}
+function createPagination(pageCount){
+    ul = jQuery(".pagination");
+    ul.children().remove();
+    //alert(pageCount);
+    if (pageCount > 1)
+    {
+        
+        //alert(ul.html());
+        ul.append('<li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>');
+        pc = pageCount + 1
+        for(var i=1; i<pc ;i++)
+         {
+              li = $('<li class="paginate_button" aria-controls="example"></li>');
+            a = $('<a href="#tblCook"></a>');
+            a.text(i);
+            a.click(function () {  
+                  //alert('click');
+                  jQuery('.paginate_button.active').removeClass('active');
+                  $(this).parent().addClass('active');
+                  $.ajax({
+                    type: "post",
+                    url: "{{=URL('cookPaginate')}}",
+                    data: {'page':$(this).text(),'dsId':jQuery("#tblCook").attr('ds_id'),'startDate':jQuery("#no_table_firsttime").text(),'endDate':jQuery("#no_table_lasttime").text()},
+                    dataType: "json",
+                    success: function(data){//成功时执行函数
+                                       //alert( "回调成功！"+data.cookData.length);
+                                       createCookTable(data.cookData);
+                     }
+                 });
+            });  
+            li.append(a);
+            ul.append(li);
+         }
+        ul.append('<li class="paginate_button next disabled" aria-controls="example" tabindex="-1" id="example_next"><a href="#">Next</a></li>');
+        ul.children("li").eq(1).addClass('active');
+    }
+}
+
+function createCookTable(data)
+{
+    tbl = jQuery("#tblCook"); 
+    tbl.children().remove();
+    for(var i=0; i<data.length; i++)
+    {
+        tr = $('<tr align="left"><td>'+data[i].date+'</td><td>'+data[i].count+'</td></tr>');
+       tbl.append(tr);
+   }
+}
+{{end}}

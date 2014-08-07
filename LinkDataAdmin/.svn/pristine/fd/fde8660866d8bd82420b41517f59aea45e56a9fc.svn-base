@@ -1,0 +1,230 @@
+﻿<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!-->
+<html class="no-js">
+<!--<![endif]-->
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title></title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="{{=URL('static','assets/img/favicon.ico')}}" type="image/x-icon">
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" href="{{=URL('static','assets/plugins/bootstrap/css/bootstrap.min.css')}}">
+    <!-- Fonts from Font Awsome -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/font-awesome.min.css')}}">
+    <!-- CSS Animate -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/animate.css')}}">
+    <!-- Custom styles for this theme -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/main.css')}}">
+    <!-- table -->
+    <link rel="stylesheet" href="{{=URL('static','assets/css/style.css')}}">
+    <!-- Feature detection -->
+    <script src="{{=URL('static','assets/js/modernizr-2.6.2.min.js')}}"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+    <script src="assets/js/html5shiv.js"></script>
+    <script src="assets/js/respond.min.js"></script>
+    <![endif]-->
+</head>
+<body>
+    <section id="container">
+        <header id="header">
+            <!--logo start-->
+            <div class="brand">
+                <a href="#" class="logo"><img src="{{=URL('static','assets/img/logo.png')}}" alt=""/></a>
+            </div>
+            <!--logo end-->
+            <div class="toggle-navigation toggle-left">
+                <button type="button" class="btn btn-default" id="toggle-left" data-toggle="tooltip" data-placement="right" title="隐藏/显示左侧菜单">
+                    <i class="fa fa-bars"></i>
+                </button>
+            </div>
+            <div class="user-nav">
+                <ul>
+                    <li class="dropdown settings">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                      欢迎回来，{{=session.user.userName}} <i class="fa fa-angle-down"></i>
+                    </a>
+                        <ul class="dropdown-menu animated fadeInDown">
+                            <li>
+                                <a href="#"><i class="fa"></i>退出系统</a>
+                            </li>
+                        </ul>
+                    </li>
+                       </ul>
+            </div>
+        </header>
+        <!--sidebar start-->
+        <aside class="sidebar">
+            <div id="leftside-navigation" class="nano">
+                <ul class="nano-content">
+                    <li class="sub-menu">
+                        <a href="{{=URL('dataSource','index')}}"><span>数据源管理</span><i class="arrow fa fa-angle-right pull-right"></i></a>
+                    </li>
+                <li class="sub-menu" id="now-nav">
+                        <a href="{{=URL('tagProj','index')}}">标签项目管理<i class="arrow fa fa-angle-right pull-right"></i></a>
+                    </li> 
+                </ul>
+            </div>
+
+        </aside>
+        <!--sidebar end-->
+        <!--main content start-->
+
+        <section class="main-content-wrapper">
+            <section id="main-content">
+                <div class="row">
+                    <div class="col-md-12">
+                        <!--breadcrumbs start -->
+                        <ul class="breadcrumb">
+                            <li>标签项目管理</li>
+                            <li>同步标签项</li>
+                        </ul>
+                        <!--breadcrumbs end -->
+                    </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h3 class="panel-title">同步标签项</h3>
+                            </div>
+								<div class="panel-body bt-border">
+                                <form class="form-horizontal" role="form">
+                                <div class="form-title">项目信息</div>
+                                <table width="400" border="0" cellspacing="0" cellpadding="0">
+                                  <tr>
+                                    <td align="right" width="155"><strong>项目名称：</strong></td>
+                                    <td width="245">{{=tagProjName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155"><strong>数据源：</strong></td>
+                                    <td width="245">{{=dataSource}}</td>
+                                  </tr>
+                                </table>
+                                </form>
+                            </div>
+                            <div class="panel-body bt-border">
+                                <div class="form-title">同步标签项</div>
+                                  <div class="bq">
+                                    <table width="100%" class="table1">
+                                      <tr align="center">
+                                        <td>已同步标签的cookie量：<span class="bqfont">{{=counted}}</span></td>
+                                        <td>未同步标签的cookie量：<span class="bqfont">{{=noCount}}</span></td>
+                                      </tr>
+                                    </table>
+                                    </div>
+                                    <div class="bq1">
+                                    <table width="750" border="0" cellspacing="0" cellpadding="0">
+                                          <tr>
+                                            <td>请选择操作：</td>
+                                            <td><button id="downAll" type="button" class="btn btn-primary btn-square">下载全部cookie数据</button></td>
+                                            <td><button id="downIncr" type="button" class="btn btn-primary btn-square">仅下载未同步的cookie数据</button></td>
+                                            <!--td><button type="submit" class="btn btn-primary btn-square">上传标记的cookie数据</button></td-->
+                                          </tr>
+                                          <tr>
+                                             <td>{{=form.custom.begin}}{{=form.custom.widget.filename}}{{=form.custom.submit}} {{=form.custom.end}}</td>
+                                          </tr> 
+                                     </table>
+                                    
+                                    </div>
+                                     <div class="bq2">您也可以使用API接口来进行自动同步，<a href="#">查看API调用方法</a></div>
+<!--                                     <div class="bq1">
+                                     <p>历史同步</p>
+                                     <table class="table">
+                                    <thead>
+                                <tr>
+                                <th width="17%">时间</th>
+                                <th width="42%">同步Cookie量</th>
+                                <th width="41%">状态</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                      <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>正在同步...&nbsp;&nbsp;<font color="red">34%</font></td>
+                                        </tr> 
+                                        <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>成功</td>
+                                        </tr> 
+                                        <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>成功</td>
+                                        </tr> 
+                                        <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>成功</td>
+                                        </tr> 
+                                        <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>成功</td>
+                                        </tr> 
+                                        <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>成功</td>
+                                        </tr> 
+                                        <tr align="center">
+                                          <td>2013-12-20 10:12</td>
+                                          <td>1213</td>
+                                          <td>成功</td>
+                                        </tr> 
+                                    </tbody>
+                                </table>
+                     <div class="mpage">
+                     <div class="col-xs-6">
+                    <div class="dataTables_info">一共 234 条用户信息</div>
+                    </div>
+                    <div class="col-xs-6">
+                    <div class="dataTables_paginate paging_simple_numbers" id="example_paginate">
+                    <ul class="pagination">
+                    <li class="paginate_button previous disabled" aria-controls="example" tabindex="0" id="example_previous"><a href="#">Previous</a></li>
+                    <li class="paginate_button active" aria-controls="example" tabindex="0"><a href="#">1</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">2</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">3</a></li><li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">4</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">5</a></li>
+                    <li class="paginate_button " aria-controls="example" tabindex="0"><a href="#">6</a></li>
+                    <li class="paginate_button next" aria-controls="example" tabindex="0" id="example_next"><a href="#">Next</a></li>
+                    </ul>
+                    </div>
+                    </div>
+                    </div>
+                                     </div> -->
+                            </div>
+                        </div>
+                    </div>                     
+                    </div>
+            </section>
+        </section>
+        <!--main content end-->       
+    </section>
+     <!-- Basic Modal -->
+ <!--Global JS-->
+    <script src="{{=URL('static','assets/js/jquery-1.10.2.min.js')}}"></script>
+    <script src="{{=URL('static','assets/plugins/bootstrap/js/bootstrap.min.js')}}"></script>
+    <script src="{{=URL('static','assets/js/application.js')}}"></script>
+
+<script>
+jQuery(document).ready(function(){
+    jQuery('#downAll').attr('onclick',"location='downAll'");
+    jQuery('#downIncr').attr('onclick',"location='downIncr'");
+    jQuery('#sub').attr('class', 'btn btn-primary btn-square');
+    jQuery('#no_table_filename').attr('class', 'btn-square');
+});
+</script>
+
+</body>
+
+</html>

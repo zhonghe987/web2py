@@ -1,0 +1,31 @@
+from gluon.scheduler import Scheduler
+ 
+sch_db = DAL('mysql://idexadmin:idex000@180.169.19.150/linkDataAdmin')
+ 
+
+def __createTagFile(projId, mode, filename):
+    import csv
+    import time
+    data = sch_db.executesql("SELECT ds_id,cookieId FROM Tag_%s" %projId) 
+    f = open(filename,"wb")
+    writer = csv.writer(f)
+    writer.writerow(['id','cookies','value'])
+    c = len(data);
+    i = 0
+    p = 10
+    print '0%'
+    for id,cookie in data:
+        writer.writerow([id,cookie,'None'])
+        i += 1        
+        d = i/c*100
+        if d >= p:
+            print '!clear!%d%%' %d
+            p += 10
+
+    f.close()
+    return 0
+ 
+tasks = dict(createTagFile=__createTagFile)
+ 
+scheduler = Scheduler(sch_db, tasks)
+

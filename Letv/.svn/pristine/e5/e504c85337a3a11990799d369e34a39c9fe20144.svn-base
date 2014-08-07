@@ -1,0 +1,96 @@
+#coding:utf8
+LIMIT = 10
+
+
+def index():
+    import math
+    breadcrumb = ['标签类别管理']
+    bigData = [(name.l_id,name.bigName) for name in letv_db().select(letv_db.bigClass.l_id,letv_db.bigClass.bigName) ]
+    midData = [(name.cr_id,name.midName) for name in letv_db().select(letv_db.midClass.cr_id,letv_db.midClass.midName) ]
+    btn = INPUT(_value='搜索',_type='submit',_id='subt')
+    form =  SQLFORM.factory(
+                                  Field('keyname',requires =  IS_NOT_EMPTY()),
+                                  Field('big',requires = IS_IN_SET(bigData)),
+                                  Field('mid',requires = IS_IN_SET(midData)),
+                                  buttons = [btn]
+                                  )
+    csdn =()
+    if form.accepts(request, session):
+        if request.vars.keyname:
+            csdn =  csdn & (letv_db.bigClass.bigName.like('%%%s%%'%request.vars.name) | letv_db.midClass.midName.like('%%%s%%'%request.vars.name) )
+            dataCount = letv_db(csdn).count(letv_db.lableClass.l_id)
+            pageCount = int(math.ceil(dataCount / LIMIT))
+        if requset.vars.big:
+            csdn = csdn & (letv_db.lableClass.l_id == request.vars.big)
+            dataCount = letv_db(csdn).count(letv_db.lableClass.l_id)
+            pageCount = int(math.ceil(dataCount / LIMIT))
+        if request.vars.mid:
+            csdn = csdn & (letv_db.lableClass.l_id == request.vars.mid)
+            dataCount = letv_db(csdn).count(letv_db.lableClass.l_id)
+            pageCount = int(math.ceil(dataCount / LIMIT))
+    
+    bigClassData = letv_db(letv_db.bigClass).select()
+    midClassData = letv_db(letv_db.midClass).select(join=letv_db.bigClass.on(letv_db.bigClass.id==letv_db.midClass.b_id))
+    bc = len(bigClassData)
+    mc = len(midClassData)
+    pageCount = int(math.ceil((bc+mc) / LIMIT))
+    data = letv_db(csdn).select(letv_db.midClass.midName,letv_db.midClass.b_id,orderby = letv_db.midClass.cr_id,limitby = (0,LIMIT) )
+    return dict(breadcrumb = breadcrumb,
+                          form = form,
+                          bigClassCount = bc,
+                          bigClassData = bigClassData,
+                          midClassCount =mc,
+                          midClassData = midClassData,
+                          pageCount = pageCount,
+                         )
+
+
+
+def splitPage():
+    count  = int(request.vars.count - 1)  * LIMIT
+    if request.vars.keyname:
+       csdn =  csdn & (letv_db.lableClass.className.like('%%%s%%'%request.vas.name))
+    if requset.vars.big:
+       csdn = csdn & (letv_db.lableClass.l_id == request.vars.big)
+    if request.vars.mid:
+       csdn = csdn & (letv_db.lableClass.l_id == request.vars.mid)
+    data = letv_db(csdn).select(letv_db.lableClass.className,letv_db.lableClass.classType,orderby = letv_db.lableClass.l_id,limitby = (count,count + LIMIT) )
+    import  gluon.contrib.simplejson
+    return resonse.json(dict(data = data))
+
+
+
+def edit():
+    breadcrumb = ['标签类别管理','新增标签类别']
+    bigData = [(0,'--------')]
+    bigData.extend([(items.l_id,items.bigName) for items in letv_db().select(letv_db.bigClass.bigName,letv_db.bigClass.l_id,orderby = letv_db.bigClass.l_id)])
+    btn = INPUT(_value='保存',_type='submit',_id='subt')
+    form = SQLFORM.factory(
+                           Field('mid_name',requires = IS_NOT_EMPTY()),
+                           Field('big_name',requires = IS_IN_SET(bigData)),
+                           Field('log_mark'),
+                           buttons = [btn]
+                           )
+    if form.accepts(request,session):
+        if request.post_vars.big_name == '0':
+            letv_db.bigClass.insert(bigName=request.post_vars.mid_name, b_mark=request.post_vars.log_mark)
+        else:           
+            letv_db.midClass.insert(b_id = request.vars.big_name,midName = request.vars.mid_name,m_mark = request.vars.log_mark)
+
+        redirect(URL('tagClassManage','index'))
+    return dict(form  = form,breadcrumb  = breadcrumb )
+
+
+
+def delete():
+    pass
+        
+        
+        
+            
+        
+        
+    
+            
+            
+       

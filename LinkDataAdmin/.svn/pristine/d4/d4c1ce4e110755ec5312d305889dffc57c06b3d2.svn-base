@@ -1,0 +1,46 @@
+{{extend 'layout.html'}}
+{{block plane}}
+                         {{=form.custom.begin}}
+								<div class="panel-body bt-border">
+									
+                                <div class="form-horizontal" role="form">
+                                <div class="form-title">基本信息</div>
+                                <table width="400" border="0" cellspacing="0" cellpadding="0">
+                                  <tr>
+                                    <td align="right" width="155">项目名称：</td>
+                                    <td width="245">{{=form.custom.widget.ed_tagname}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">数据源：</td>
+                                    <td width="245">{{=form.custom.widget.source}}</td>
+                                  </tr>
+                                </table>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>                     
+                    </div>
+                    <div class="col-md-12" align="center">
+                        {{=form.custom.submit}}
+                        {{=form.custom.end}}
+                       <a href = {{=URL('tagProj','index')}}><button id="cancl" type="button" class="btn">取消</button></a>
+                    </div>
+                    
+            
+ {{end}}
+{{block script}}
+jQuery('#no_table_ed_tagname').attr('class','form-control');
+jQuery('#no_table_source option:first').remove();
+jQuery('#no_table_source').attr('class','form-control input-sm');
+jQuery('#sube').attr('class','btn btn-primary');
+jQuery('#no_table_source').attr('disabled','disabled');
+jQuery('#sube').click(function(){
+	var name = jQuery('#no_table_ed_tagname').val();
+	if (name ==""){
+		return false;
+	}else{
+		jQuery('#no_table_source').attr("disabled", false);
+	}
+});
+{{end}}
