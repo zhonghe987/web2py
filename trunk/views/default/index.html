@@ -1,0 +1,80 @@
+
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+
+{{extend 'layout.html'}}
+
+{{block head}}
+
+{{end}}
+
+{{block content}}
+<div class="panel-body" >
+	<h1><font size="5">欢迎使用</font>艾瑞标签数据管理工具</h1>
+	</div>
+<div class="col-md-6 col-sm-6" style="width:49%">
+                        <div style="background-color:#4BAFF3"class="dashboard-tile detail tile-blue">
+                            <div class="content">
+                                <h1 class="text-left timer" data-from="0" data-to="32" data-speed="2500">标签管理</h1>
+                                <p>已创建 <font color="red">{{=tagCount}}</font> 个标签</p>
+                            </div>
+                            <div class="icon"><i class="fa fa-bar-chart-o"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-sm-6" style="width:49%; margin-left:2%">
+                        <div  style="background-color:#B075C9"class="dashboard-tile detail tile-purple">
+                            <div class="content">
+                                <h1 class="text-left timer" data-to="105" data-speed="2500">内容库管理</h1>
+                                <p>已创建 <font color="red">{{=contCount}}</font> 条记录</p>
+                            </div>
+                            <div class="icon"><i class="fa fa-bar-chart-o"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    
+                    
+                    <div class="col-md-12">
+
+                        <div class="panel panel-default">
+                          <div class="panel-heading">
+                          <h2 align="left">日志记录</h2>
+                          <h4 align="left">共有<font color="red">{{=logCount}} </font>条记录</h4> 
+                          <p >开始时间：{{=first.createDate}}</p>  
+                          <p>结束时间：{{=last.createDate}}</p>
+                            </div>
+                            <div class="panel-body">
+                             
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>时间</th>
+                                                <th>ip</th>
+                                                <th>数量</th>
+                                                
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                        	{{for i,v in enumerate(data):}}   
+                                            <tr align="center">
+                                                <td width="10%">{{=v.createDate}}</td>
+                                                <td width="10%">{{=v.ip}}</td>
+                                                <td width="10%">{{=v.count}}</td>
+                                            </tr>
+                                            {{pass}}
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+
+{{}}

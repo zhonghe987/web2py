@@ -1,0 +1,121 @@
+
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+
+{{extend 'layout.html'}}
+
+{{block head}}
+
+{{end}}
+
+{{block content}}
+<div class="row">
+                  <div class="col-md-12">
+                  	
+                        <div class="panel panel-default">
+                        	{{=form.custom.begin}}  
+							<div class="panel-body bt-border">
+                                
+                                <div class="form-title">帐号信息</div>
+                                <table width="600" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="right" width="155">帐号类别：</td>
+                                    <td width="300">{{=form.custom.widget.classes}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">帐号：</td>
+                                    <td width="300">{{=form.custom.widget.username}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">密码：</td>
+                                    <td width="300">{{=form.custom.widget.password}}</td>
+                                    <td width="100">&nbsp;&nbsp;<input name="box" id="show" type="checkbox">显示密码</td>
+                                  </tr>
+                                </table>
+                                
+                            </div>
+                        <div class="panel-body bt-border">
+                                
+                                <div class="form-title">用户信息</div>
+                                <table width="600" border="0" cellspacing="0" cellpadding="0">
+                                <tr>
+                                    <td align="right" width="155">姓名：</td>
+                                    <td width="300">{{=form.custom.widget.chinaName}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">公司媒体名称：</td>
+                                    <td width="300">{{=form.custom.widget.company}}</td>
+                                  </tr>
+                                  <tr>
+                                    <td align="right" width="155">部门：</td>
+                                    <td width="300">{{=form.custom.widget.depart}}</td>
+                                    <td width="100">&nbsp;&nbsp;</td>
+                                  </tr>
+                                  
+                                </table>
+                               
+                            </div>
+                        </div>
+                    </div>                     
+                    </div>
+                    <div class="col-md-12 ml20 mt15" id="last">
+                       {{=form.custom.submit}}&nbsp;&nbsp;&nbsp;&nbsp;
+                      
+                 
+                    </div>
+                    
+                     {{=form.custom.end}}
+                     
+                     
+                   
+{{end}}
+
+{{block script}}
+if('{{=data.classes}}' == "visit"){
+	$("#no_table_classes").val("visit");
+}else if('{{=data.classes}}' == "user"){
+	$("#no_table_classes").val("user");
+}
+
+
+jQuery('#no_table_username').attr('value','{{=data.username}}');
+jQuery('#no_table_password').attr('value','{{=data.showPass}}');
+jQuery('#no_table_chinaName').attr('value','{{=data.chinaName}}');
+jQuery('#no_table_company').attr('value','{{=data.company}}');
+jQuery('#no_table_depart').attr('value','{{=data.depart}}');
+jQuery('#subt').attr('class','btn btn-primary')
+jQuery('#no_table_classes option:first').remove();
+jQuery('#no_table_password').attr('type','password');
+jQuery('#no_table_classes').attr('class','form-control');
+jQuery('#no_table_username').attr('class','form-control');
+jQuery('#no_table_password').attr('class','form-control');
+jQuery('#no_table_chinaName').attr('class','form-control');
+jQuery('#no_table_company').attr('class','form-control');
+jQuery('#no_table_depart').attr('class','form-control');
+jQuery('div[id="last"] div').append('&nbsp;&nbsp;<button type="submit" id="can" class="btn" value="取消">取消</button>');
+jQuery('#can').click(function(){
+       window.location.href='{{=URL('admin','userManage')}}';	
+});
+jQuery('#show').click(function(){
+    if (this.checked) {
+        $("input[name='box']:checkbox").each(function() { 
+             $(this).prop("checked", true);
+             $(this).attr('vs','t1');
+             var v = $(this).attr('id');
+             var it = "#"+v+"";
+             jQuery('#no_table_password').attr('type','text');
+             jQuery('#no_table_password').attr('value','{{=data.showPass}}');
+             $(this).attr('onclick',"btn_remove('"+it+"')");
+            });
+    } else {
+        $("input[name='box']:checkbox").each(function() { 
+            $(this).prop("checked", false);
+            $(this).removeAttr('vs');
+            jQuery('#no_table_password').attr('type','password');
+            jQuery('#no_table_password').attr('value','{{=data.showPass}}');
+           });
+    }
+   });
+
+{{end}}

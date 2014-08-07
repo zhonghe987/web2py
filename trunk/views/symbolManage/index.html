@@ -1,0 +1,161 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+
+{{extend 'layout.html'}}
+
+{{block head}}
+<script type="text/javascript" src="{{=URL('static','assets/js/CustomPagination.js')}}"></script> 
+{{end}}
+
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+               
+                <div class="add-user">
+                    <a href="{{=URL('symbolManage','dimNew')}}"> <button type="button" class="btn btn-primary" style="margin-top:5px">新增维度</button></a>
+                </div>    
+                
+                <table class="table" style="margin-top:5px">
+                    <thead>
+                        <tr>
+                            <th width="5%">编号</th>
+                            <th width="10%">符号</th>
+                            <th width="10%">显示</th>
+                            <th width="20%">描述</th>
+                            <th width="20%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ for i, r in enumerate(dimData):}}
+                        <tr align="center">
+                            <td>{{=i+1}}</td>
+                            <td>{{=r.symbol}}</td>
+                            <td>{{=r.name}}</td>
+                            <td>{{=r.dimDesc}}</td>
+                            <td><a href="{{=URL('dimeEdit',vars=dict(id=r.d_id))}}">编辑</a>&nbsp;&nbsp;<a onclick="dimDelet('{{=r.d_id}}','{{=r.name}}')"  data-toggle="modal" data-target="#basic"  href="#">删除</a></td>
+                        </tr> 
+                        {{pass}}            
+                    </tbody>
+                </table>
+            </div>
+            <div class="panel-body">
+               
+                <div class="add-user">
+                    <a href="{{=URL('symbolManage','eleNew')}}"> <button type="button" class="btn btn-primary" style="margin-top:5px">新增元素</button></a>
+                </div> 
+                
+                <table class="table" style="margin-top:5px">
+                    <thead>
+                        <tr>
+                            <th width="5%">编号</th>
+                            <th width="10%">符号</th>
+                            <th width="10%">显示</th>
+                            <th width="15%">类别</th>
+                            <th width="20%">描述</th>
+                   
+                            <th width="20%">操作</th>
+                            
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {{ for i, r in enumerate(eleData):}}
+                        <tr align="center">
+                            <td>{{=i+1}}</td>
+                            <td>{{=r.Element.symbol}}</td>
+                            <td>{{=r.Element.name}}</td>
+                            <td>{{=r.Dimension.name}}</td>
+                            <td>{{=r.Element.eleDesc}}</td>
+                            
+                            <td><a href="{{=URL('itemEdit',vars=dict(ids=r.Element.e_id))}}">编辑</a>&nbsp;&nbsp;<a onclick=change({{=r.Element.e_id}},'{{=r.Element.symbol}}') data-toggle="modal" data-target="#basicModal" href="#" >删除</a></td>
+                           
+                        </tr> 
+                        {{pass}}            
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>  
+</div>
+<div class="modal fade" id="basic" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div align="center" class="modal-body">
+                   <p></p> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id='dims'  class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title" id="myModalLabel">提示</h4>
+                </div>
+                <div align="center" class="modal-body">
+                   <p></p> 
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id='sure'  class="btn btn-primary">确定</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{{end}}
+
+{{block script}}
+jQuery('#sure').click(function(){
+	$.ajax({
+		type:'POST',
+		url:"{{=URL('symbolManage','itemDelet')}}",
+		data:{'ids':jQuery('#sure').attr('values')},
+		dataType:'json',
+		success:function(data){
+			if(data == 0){
+			location.reload();
+			}
+		}
+	});
+})
+
+jQuery('#dims').click(function(){
+	$.ajax({
+		type:'POST',
+		url:"{{=URL('dimDlete')}}",
+		data:{'id':jQuery('#dims').attr('values')},
+		dataType:'json',
+		success:function(data){
+			if(data == 0){
+			location.reload();
+			}
+		}
+	});
+})
+{{end}}
+{{block script func}}
+function change(ids,symbol){
+	jQuery('button#sure').attr('values',ids);
+	jQuery('div.modal-body p').remove();
+	jQuery('div.modal-body').append('<p>确定删除&nbsp;&nbsp;<span style="color:red">'+symbol+'</span>&nbsp;&nbsp;记录？</p>');
+}
+
+function dimDelet(ids,name){
+	jQuery('button#dims').attr('values',ids);
+	jQuery('#basic div.modal-body p').remove();
+	jQuery('#basic div.modal-body').append('<p>确定删除&nbsp;&nbsp;<span style="color:red">'+name+'</span>&nbsp;&nbsp;记录？</p>');
+}
+{{end}}
+

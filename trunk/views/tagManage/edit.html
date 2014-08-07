@@ -1,0 +1,242 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+.block-margin{
+    margin:5px 5px 5px 5px;
+}
+</style>
+<link rel="stylesheet" href="{{=URL('static','assets/plugins/icheck/css/_all.css')}}">
+<script src="{{=URL('static','assets/plugins/icheck/js/icheck.min.js')}}"></script>
+<script src="{{=URL('static','js/tagNew.js')}}"></script>
+{{end}}
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel">
+            <div class="panel-body">
+                <table width="500" border="0" cellspacing="0" cellpadding="0">
+                    <tr>
+                        <td align="right" width="155"> 标签名称：</td>
+                        <td align="right" width="255">
+                            <input class="form-control" id="tagName" type="text" value={{=data.name}}>
+                        </td>
+                    <tr>
+                    <tr>
+                        <td align="right" width="155"> 描述：</td>
+                        <td align="right" width="255">
+                            <textarea class="form-control"sytle="height:70px;" id="desc" type="text" value=""></textarea>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td align="right" width="155">状态：</td>
+                        <td align="left" width="255">
+                           <label class="radio-inline" status="active">
+                               <input class="icheck" type="radio" name="rad1" {{if data.status=="active":}} checked{{pass}}>
+                               激活  ( 可以导出 )
+                           </label>
+                           <label class="radio-inline" status="not active">
+                               <input class="icheck" type="radio" name="rad1" {{if data.status!="active":}} checked {{pass}}>
+                               未激活  ( 不可以导出 )
+                           </label>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-primary border-01">
+                    <div class="panel-heading">
+                        <h4 class="panel-title">行为维度: </h4>                     
+                    </div>
+                    <table class="table table-bordered" style="margin-top:10px">
+                        <tbody >
+                            <tr align="center">
+                                <td>频次</td>
+                                <td>大于，等于</td>
+                                <td>
+                                    <input id="actFeq" type="text" class="form-control" value="1">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>       
+                </div>
+            </div>
+            <div class="panel-body">
+                <div class="panel panel-primary border-01">
+                    <div class="panel-heading">
+                        <div class="pull-right">
+                            <button id="addGrp" class="btn" onclick="initGroup()">添加规则组</button>
+                        </div>
+                        <h4 class="panel-title">内容维度: </h4>                     
+                    </div>
+                    <div class="" id="dimContent">
+                    </div>        
+                </div>
+                <div class="panel-body" align="center">
+                    <button type="button" class="btn btn-primary"  id="sub">保存</button>
+                    <button type="button" class="btn" id="cancel">取消</button>
+                </div>
+            </div>
+        </div>
+    </div> 
+</div>
+
+<select id="selDimContent" onchange="showLcDlg(this, 'new')" class="form-control form-input hide">
+    <option value="">添加元素</option>
+    {{ for e in eleData:}}
+    {{ if e.Dimension.name ==  "内容维度": }}
+    <option value="{{=e.Element.symbol}}" check="{{=e.Element.dbCheck}}">{{=e.Element.name}}</option>
+    {{pass}}
+    {{pass}}
+</select>
+
+<div class="modal fade in" id="LC" tabindex="-1" role="dialog" aria-labelledby="downModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="titleLbl"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="form-horizontal">
+                    <div class="form-group">
+                        <label class="col-sm-2 control-label"></label>
+                        <div class="col-sm-10">
+                            <textarea class="form-control mar5"></textarea>
+                           <label>以"|"间隔,</label>
+                            <label id="info">建议进行检查</label>
+                        </div>
+                    </div>
+                    <div class="form-group" align="center">
+                        <button id="btnChk" type="button" class="btn" >检查</button>
+                       <!-- <button id="btnChkCnl" type="button" class="btn hide">取消检查</button> -->
+                       <!-- <div class="progress hide" style="margin-top:5px">
+                            <div id="checkProgress" class="progress-bar progress-bar-success" style="width: 10%">正在检查中......</div>
+                       </div> -->
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="btnSub" type="button" class="btn btn-primary" data-dismiss="modal">保存</button>
+                <button id="btnCnl" type="button" class="btn" data-dismiss="modal">取消</button>
+           </div>
+        </div>
+    </div>
+</div>
+                        
+<div class="modal fade in" id="dlgInfo" tabindex="-1" role="dialog" aria-labelledby="downModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div align="center" class="modal-body">
+               <p></p> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id='sure'  class="btn btn-primary">确定</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{block  script}}
+//alert("{{=data.json}}");
+rules = JSON.parse("{{=data.json}}".replace(/&quot;/g,'"'));
+//alert(JSON.stringify(rules));
+jQuery('#desc').val("{{=data.tagDesc}}")
+//urlContentCheck = "{{=URL('contentCheck')}}";
+//urlGetChechInfo = "{{=URL('getCheckInfo')}}";
+urlContentCheck = "{{=URL('tagManage','checkElement')}}";
+$("input.icheck").iCheck({radioClass:'iradio_flat-grey'});
+
+$('#cancel').click(function(){
+        window.location = "{{=URL('index')}}";
+});
+
+
+$('#startDate').datepicker();
+$('#endDate').datepicker();
+
+$(function($){                   
+    $.datepicker.regional['zh-CN'] = { 
+        closeText: '关闭',  
+        prevText: '<上月',                      
+         nextText: '下月>', 
+        currentText: '今天',                   
+        monthNames: ['一月','二月','三月','四月','五月','六月', 
+                                   '七月','八月','九月','十月','十一月','十二月'],          
+        monthNamesShort: ['一','二','三','四','五','六','七','八','九','十','十一','十二'],                  
+        dayNames: ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'],
+        dayNamesShort: ['周日','周一','周二','周三','周四','周五','周六'],    
+        dayNamesMin: ['日','一','二','三','四','五','六'],              
+        weekHeader: '周',              
+        dateFormat: 'yy-mm-dd',  
+        firstDay: 1,              
+        isRTL: false,            
+        showMonthAfterYear: true,               
+        yearSuffix: '年'};         
+       $.datepicker.setDefaults($.datepicker.regional['zh-CN']); 
+});
+
+$("#actFeq").val(rules.FQ);
+
+
+for(var i=0; i<rules.LC.length; i++){
+    var sel = initGroup();    
+    var tbl = sel.next();
+    for(var f in rules.LC[i]){
+        var s = sel.find("option[check="+f+"]");
+        createLC(tbl, s, rules.LC[i][f]);
+        s.remove();
+    }
+    if(sel.children().length == 1){
+        sel.addClass("hide");
+    }
+}
+
+$('#sure').click(function(){
+    $("#dlgInfo").css('display', 'none');
+})
+
+$("#sub").click(function(){
+    var result = save("{{=URL('checkTagName')}}",  "{{=URL('edit')}}", "{{=URL('index')}}", {{=data.id}});
+    
+    var d;
+    switch(result){
+        case 101:
+            d = $("#dlgInfo p").parent();
+            d.children().remove();
+            d.append('<p><h4>请填写&nbsp;&nbsp;<span style="color:red;">标签名称</span></h4></p>');
+            $("#dlgInfo").css('display', 'block');
+            break;
+        case 102:
+            d = $("#dlgInfo p").parent();
+            d.children().remove();
+            d.append('<p><h4>标签名称: &nbsp;&nbsp;<span style="color:red;">'+$("#tagName").val()+ '</span>&nbsp;&nbsp;已存在，请修改</h4></p>');
+            $("#dlgInfo").css('display', 'block');
+            break;
+        case 201:
+            d = $("#dlgInfo p").parent();
+            d.children().remove();
+            d.append('<p><h4>请填写&nbsp;&nbsp;<span style="color:red;">内容维度</span></h4></p>');
+            $("#dlgInfo").css('display', 'block');
+            break;
+    }
+});
+
+$('#addGrp').tooltip()
+
+$($("#LC").find("textarea")[0]).keyup(function(){
+    $(this).next().next().text("建议进行检查");
+});
+
+$("#actFeq").keyup(function(){
+    checkFeq(this);
+});
+{{end}}
+
+

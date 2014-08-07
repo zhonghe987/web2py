@@ -1,0 +1,260 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+
+{{extend 'layout.html'}}
+
+{{block head}}
+<script type="text/javascript" src="{{=URL('static','assets/js/CustomPagination.js')}}"></script> 
+<link rel="stylesheet" href="{{=URL('static','assets/plugins/icheck/css/_all.css')}}">
+<script src="{{=URL('static','assets/plugins/icheck/js/icheck.min.js')}}"></script>
+<script src="{{=URL('static','js/tagInx.js')}}"></script>
+{{end}}
+
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body">
+                <div class="tab-wrapper tab-primary">
+                    <ul class="nav nav-tabs">
+                        <li class="active">
+                            <a href="#rule" data-toggle="tab">规则管理</a>
+                        </li>
+                        <li>
+                            <a href="#dimDate" data-toggle="tab">时间维度管理</a>
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="rule">
+                            {{if auth.user.classes !='visit':}}
+                            <div class="add-user">                	
+                                <button type="button" class="btn" style="margin:10px 10px;" id="btnStatusUpdate">状态更新</button>
+                                <button type="button" class="btn" style="margin:10px 10px;" id="btnTagDown" data-toggle="modal" data-target="#downModal">导出标签</button>
+                                <a href="{{=URL('new')}}"> <button type="button" class="btn btn-primary" style="margin:10px 10px;">新增标签</button></a>
+                            </div>        
+                            {{pass}}           
+                            <div class="table-control">
+                                {{=form.custom.begin}}
+                                <table  class="bq">
+                                    <tr>
+                                        <td width="6%" align="right">标签名称：</td>
+                                        <td width="10%" align="left">{{=form.custom.widget.tagName}}</td>
+                                        <td width="6%" align="right">状态：</td>
+                                        <td width="10%" align="left">{{=form.custom.widget.status}}</td>
+                                        <td width="10%" align="center">{{=form.custom.submit}}</td>
+                                         <td colspan="5 width="60%"></td>                                     
+                                    </tr>
+                                </table>
+                                {{=form.custom.end}}
+                            </div>
+                            <div class="panel-body1">                           
+                                <table class="table" style="margin-top:10px">
+                                    <thead>
+                                        <tr>
+                                            <th width="10%">编号</th>
+                                            <th width="10%">标签名称</th>
+                                            <th width="10%">频次</th>
+                                            <th width="15%">创建时间</th>
+                                            <th width="10%" align="left">
+                                                <div class="radio">
+                                                    <input class="icheck" type="checkbox" id="checkAll" status="">
+                                                    <label>状态</label>
+                                                </div>
+                                            </th>
+                                            <th width="15%">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tblTag" tagName="{{=find['tagName']}}" status="{{=find['status']}}" pageCount="{{=pageCount}}">     
+                                        {{ for i, r in enumerate(data):}}
+                                        <tr align="center" desc="{{=r.tagDesc}}" json="{{=r.json}}">
+                                            <td>{{=i+1}}</td>
+                                            <td>{{=r.name}}</td> 
+                                            <td>{{=r.json}}</td>
+                                            <td>{{=r.createDate}}</td>
+                                            <td align="left" id="{{=r.id}}" initStatus="{{=r.status}}" finStatus="{{=r.status}}">
+                                                <div class="radio">
+                                                    <input class="icheck" type="checkbox"  {{if r.status=="active":}}checked{{pass}}>
+                                                    <label>{{=r.status}}</label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <a href="#" onclick="show(this)">查看</a>
+                                                <a href="{{=URL('edit', vars=dict(id=r.id))}}">编辑</a>
+                                                <a href="#" onclick="change({{=r.id}}, '{{=r.name}}', {{=i}}, {{=i}})"   data-toggle="modal" data-target="#dlgDel">删除</a>
+                                            </td>
+                                        </tr> 
+                                        {{pass}}  
+                                    </tbody>
+                                </table>
+                                <div class="mpage">
+                                    <div class="col-xs-6">
+                                       <div class="dataTables_info">共 {{=count}} 条信息</div>
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div id="tagPaginate"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane" id="dimDate">
+                            <div class="panel panel-primary">
+                                <div class="panel-heading2">
+                                </div> 
+                                <div class="panel-body1"  id="dimDate">
+                                    <table class="table" style="margin-top:10px">
+                                        <thead>
+                                            <tr>
+                                                <th width="20%">编号</th>
+                                                <th width="10%">显示</th> 
+                                                <th width="40%">描述</th>
+                                                <th width="30%" align="left">
+                                                    <div class="radio">
+                                                        <input class="icheck" type="checkbox" id="eleDateAll" status="">
+                                                        <label>状态</label>
+                                                    </div>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tblEleDate" >     
+                                            {{ for i, r in enumerate(eleDate):}}
+                                            <tr align="center">
+                                                <td>{{=i+1}}</td> 
+                                                <td>{{=r.Element.symbol}}</td> 
+                                                <td>{{=r.Element.name}}</td>
+                                                <td align="left" id="{{=r.Element.id}}" initStatus="{{=r.Element.dbCheck}}" finStatus="{{=r.Element.dbCheck}}">
+                                                    <div class="radio">
+                                                        <input class="icheck" type="checkbox"  {{if r.Element.dbCheck=="selected":}}checked{{pass}}>
+                                                        <label>{{=r.Element.dbCheck}}</label>
+                                                    </div>
+                                                </td>
+                                            </tr> 
+                                           {{pass}}  
+                                        </tbody>
+                                    </table>
+                                </div>
+                                <div class="panel-body bt-border" align="center">
+                                  <button type="button" class="btn btn-primary"  id="eleDateSave" disabled>保存</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>  
+    </div>
+</div>
+
+<div class="modal fade in" id="downModal" tabindex="-1" role="dialog" aria-labelledby="downModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="downModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div id="downProgress" class="progress-bar progress-bar-success" style="width: 10%">10%</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDown" type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+           </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade in" id="showModal" tabindex="-1" role="dialog" aria-labelledby="downModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="showLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="panel panel-primary">
+                    <div class="panel-body" style="width:520px; height=260px;">
+                        <h4>描述: </h4>
+                        <textarea disabled="true" id="showDesc" style="width:500px;height:80px"></textarea>
+                        <h4>规则: </h4>
+                        <textarea disabled="true" id="showRule" style="width:500px;height:160px"></textarea>
+                    </div>
+               </div>
+               <div class="modal-footer">
+                   <button id="btnShow" type="button" class="btn btn-primary" data-dismiss="modal">返回</button>
+               </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgDel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div align="center" class="modal-body">
+               <p></p> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id='sure'  class="btn btn-primary">确定</button>
+                <button type="button" id="can" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{block script}}
+jQuery('#btnStatusUpdate').attr('class','btn btn-primary block-margin');
+jQuery('#btnTagDown').attr('class','btn btn-primary block-margin');
+jQuery('#sub').attr('class','btn btn-primary block-margin');
+urlTagDel = "{{=URL('tagDel')}}";
+urlEdit = "{{=URL('edit')}}"
+
+$("input.icheck").iCheck({checkboxClass: 'icheckbox_flat-grey'});
+$("#tblTag ins").click(function(){selectIns(this)});
+$("#checkAll").next().click(function(){selectIns(this)});
+$("#btnStatusUpdate").click(function(){ statusUpdate("{{=URL('statusUpdate')}}")});
+$("#btnTagDown").click(function(){ 
+    tagDown("{{=URL('tagDown')}}", "{{=URL('getTaskProgress')}}")
+});
+
+$('#no_table_tagName').attr('class','form-control form-input');
+$('#no_table_tagName').val($("#tblTag").attr("tagName"));
+$('#no_table_status').attr('class','form-control form-input');
+$('#no_table_status option:first').remove();
+$('#no_table_status').val($("#tblTag").attr('status'));
+
+
+options = {
+    'callback': getPaginationInfo,
+    'paginationUrl': "{{=URL('tagPaginate')}}",
+    'fieldText':'跳转到'
+}
+jQuery("#tagPaginate").pagination({{=pageCount}}, 1, options);
+
+dim = JSON.parse("{{=dim}}".replace(/&quot;/g,'"'))
+ele = JSON.parse("{{=eleContent}}".replace(/&quot;/g,'"'));
+showRule();
+
+showEleDateStatus();
+$("#tblEleDate ins").click(function(){selectDateIns(this)});
+$("#eleDateAll").next().click(function(){selectDateIns(this)});
+$("#eleDateSave").click(function(){
+    save("{{=URL('eleDateSave')}}")
+});
+
+$("#btnShow").click(function(){
+    $("#showModal").css("display", "none");
+    $("#showLabel").text(""); 
+    $("#showDesc").text("");
+    $("#showRule").text("");
+});
+
+$('#sure').click(function(){
+    obj = $(this);
+    delTag(obj.attr('values'), obj.attr('num'), obj.attr('row'));
+    $("#dlgDel .modal-footer > #can").click();
+})
+{{end}}

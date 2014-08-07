@@ -1,0 +1,79 @@
+
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+.block-margin{
+    margin:5px 5px 5px 5px;
+}
+</style>
+{{end}}
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body bt-border">
+                <div class="form-horizontal" role="form">
+                    {{=form.custom.begin}}
+                    <table width="500" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td align="right" width="155">符号：</td>
+                            <td width="245">{{=form.custom.widget.symbol}}</td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">显示：</td>
+                            <td width="245">{{=form.custom.widget.name}}</td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">类别：</td>
+                            <td width="245">{{=form.custom.widget.classes}}</td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">状态：</td>
+                            <td width="245">{{=form.custom.widget.status}}</td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">描述：</td>
+                            <td width="245">
+                                {{=form.custom.widget.eleDesc}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12 ml20 mt15" >
+            {{=form.custom.submit}}
+            </div>
+            {{=form.custom.end}}
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{block  script}}
+
+jQuery('#no_table_symbol').attr('value','{{=data.Element.symbol}}');
+jQuery('#no_table_name').attr('value','{{=data.Element.name}}');
+jQuery("#no_table_classes").val('{{=data.Dimension.d_id}}');
+jQuery('#no_table_status').val('{{=data.Element.status}}');
+jQuery('#no_table_eleDesc').val('{{=data.Element.eleDesc}}');
+jQuery('#no_table_symbol').attr('class','form-control');
+jQuery('#no_table_name').attr('class','form-control');
+jQuery('#no_table_eleDesc').attr('class','form-control');
+jQuery('#no_table_eleDesc').attr('style','width: 350px;height: 100px;');
+jQuery('#no_table_status').attr('class','form-control');
+jQuery('#no_table_status option:first').remove();
+jQuery('#no_table_classes').attr('class','form-control');
+jQuery('#no_table_classes option:first').remove();
+jQuery('#sub').attr('class','btn btn-primary block-margin');
+jQuery('#cancel').attr('class','btn block-margin');
+jQuery('#cancel').click(function(){
+        window.location.href='{{=URL('symbolManage','index')}}';
+
+
+});
+
+
+{{end}}

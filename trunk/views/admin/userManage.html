@@ -1,0 +1,281 @@
+{{ from AppFunc import status, show}}
+
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+<script type="text/javascript" src="{{=URL('static','assets/js/CustomPagination.js')}}"></script> 
+{{end}}
+{{block content}}
+<div class="col-md-12">
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="table-control">
+            <div class="bq">
+                {{=form.custom.begin}}
+                <table width="900" border="0" cellspacing="0" cellpadding="0" class="tabq">
+                    <tr>
+                        <td width="100" align="right">帐号：</td>
+                        <td width="160" align="left">{{=form.custom.widget.username}}</td>
+                        <td width="100" align="right">姓名：</td>
+                        <td width="160" align="left">{{=form.custom.widget.name}}</td>
+                        <td width="100" align="right">帐号类别：</td>
+                        <td width="160" align="left">{{=form.custom.widget.classes}}</td>
+                        <td width="120" align="center">{{=form.custom.submit}}</td>
+                    </tr>
+                </table>                
+                {{=form.custom.end}}
+            </div>
+        </div>
+    </div>
+    <div class="panel-body2">
+        <div class="delete-all">
+           <button type="button" id="allFreeze"  style="margin-right:10px;" class="btn btn-default">批量冻结</button>
+           <a href="{{=URL('admin','addUser')}}"><button type="button" class="btn btn-primary">新增用户</button></a>
+        </div>
+    </div>
+    <div class="panel-body">                           
+        <table class="table mt15">
+            <thead>
+                <tr>
+                    <th width="5%"><input id="checkall" type="checkbox"></th>
+                    <th width="20%">帐号</th>
+                    <th width="20%"> 姓名</th>
+                    <th width="15%">帐号类别</th>
+                    <th width="20%">创建时间</th>
+                    <th width="15%">操作</th>
+                </tr>
+            </thead>
+            <tbody id="tblContent" classes="{{=find['classes']}}" username="{{=find['username']}}" name="{{=find['name']}}" ids="{{=find['idList']}}">
+                {{for i, r in enumerate(datas):}}
+                <tr align="center">
+                    <td><input type="checkbox" name='box' id={{=r.id}}></td>
+                    <td>{{=r.username}}</td>
+                    <td>{{=r.chinaName}}</td>
+                    <td>{{=show(r.classes)}}</td>
+                    <td>{{=r.datetime}}</td>
+                    <td>&nbsp;&nbsp;<a href="{{=URL('editUser',vars=dict(eid=r.id))}}">编辑</a>&nbsp;&nbsp;<a href='#'  onclick=changeStatus({{=r.id}},{{=i+1}}) data ={{=r.status}} id="btn_{{=i+1}}" >{{=status(r.status)}}</a>&nbsp;&nbsp;</td>
+                </tr>
+                {{pass}}                                        
+            </tbody>
+        </table>
+        <div class="mpage">
+            <div class="col-xs-6">
+                  <div class="dataTables_info" align="left">共 {{=count}} 条信息</div>
+            </div>
+            <div class="col-xs-6">                    
+               <div id="userPaginate"></div>                    
+            </div>
+       </div>
+    </div>
+</div>
+</div>
+{{end}}
+
+{{block script}}
+jQuery('#subt').attr('class','btn btn-primary block-margin');
+	   //复选框
+  jQuery('#checkall').click(function(){
+    if (this.checked) {
+        $("input[name='box']:checkbox").each(function() { 
+             $(this).prop("checked", true);
+             $(this).attr('vs','t1');
+             var v = $(this).attr('id');
+             var it = "#"+v+"";
+             $(this).attr('onclick',"btn_remove('"+it+"')");
+            });
+    } else {
+        $("input[name='box']:checkbox").each(function() { 
+            $(this).prop("checked", false);
+            $(this).removeAttr('vs');
+           });
+    }
+   });
+   
+
+   
+jQuery('#allFreeze').click(function(){
+	var daV='';
+  	$('input[vs="t1"]:checkbox').each(function(){
+  		daV+=$(this).attr('id')+',';
+  	});
+  	if(daV){
+  	$.ajax({
+  		type: "POST",
+  		url: "{{=URL('freeze')}}",
+  		data: {'status':daV,'ids':jQuery('#tblContent').attr('ids')},
+  		dataType: "json",
+  		success:function(data){
+  			//alert(data.data);
+  			tbl = jQuery("#tblContent"); 
+            tbl.children().remove();
+            var tr,td;
+            $('#checkall').prop("checked", false);
+  		    for(var i=0; i <= data.data.length; i++){
+  			   tr = $('<tr align="center"></tr>');
+                td = $("<td></td>");
+                td.append('<input type="checkbox" name="box" id='+data.data[i].id+'>');
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].username);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].chinaName);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].classes);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].datetime);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append('&nbsp;&nbsp;&nbsp;');
+                a=$("<a>编辑</a>");
+                a.attr('href','editUser'+'?eid='+data.data[i].id);
+                td.append(a);
+                td.append('&nbsp;&nbsp;&nbsp;');
+                a=$('<a>'+change(data.data[i].status)+'</a>');
+                a.attr('href','#');
+                a.attr('id','btn_'+(i+1)+'');
+                a.attr('data',data.data[i].status);
+                a.attr('onclick','changeStatus('+data.data[i].id+','+(i+1)+')')
+                td.append(a);
+                td.append('&nbsp;&nbsp;&nbsp;');
+                tr.append(td);
+                tbl.append(tr);
+  			}
+  		}
+  		
+  	});
+  	}
+});   
+jQuery('#no_table_classes option:first').remove();
+jQuery('#no_table_classes').attr('class','form-control');
+jQuery('#no_table_username').attr('class','form-control p5');
+jQuery('#no_table_name').attr('class','form-control p5');
+var username = jQuery('#tblContent').attr('username');
+var name = jQuery('#tblContent').attr('name');
+var classes = jQuery('#tblContent').attr('classes');
+jQuery('#no_table_username').val(username);
+jQuery('#no_table_name').val(name);
+jQuery('#no_table_classes').val(classes);
+ 
+options = {
+    'callback': getPaginationInfo,
+    'fieldText':'跳转到'
+}
+
+jQuery("#userPaginate").pagination({{=pageCount}}, 1, options);
+
+
+
+
+{{end}}
+
+
+
+{{block script func}}
+function btn_remove(it){
+	if($(it).attr("vs")=='t1'){
+		$(it).removeAttr('vs');
+		}else{
+			$(it).attr('vs','t1');
+			}
+}
+
+function changeStatus(ids,idn){
+	s = jQuery('#btn_'+idn+'').attr('data');
+	jQuery.ajax({
+		type:'post',
+		url:'{{=URL('admin','freeze')}}',
+		dataType:'json',
+		data:{'id':ids,'status':s},
+		success:function(data){
+			jQuery('#btn_'+idn+'').attr('data',data);
+			if(data == '1'){
+				jQuery('#btn_'+idn+'').text('冻结');
+			}else{
+				jQuery('#btn_'+idn+'').text('激活');
+			}
+		}
+	});
+}
+
+
+
+function getPaginationInfo(page){
+	//alert(jQuery("#tblContent").attr('classes'));
+    //alert('get pagination info');
+    $.ajax({type: "post",
+        url: "{{=URL('admin','backData')}}",
+        data: {     'page':page,
+                    'username':jQuery("#tblContent").attr("username"),
+                    'name':jQuery("#tblContent").attr("name"),
+                    'classes':jQuery("#tblContent").attr('classes')
+                   },
+        dataType: "json",
+        success: function(data){//成功时执行函数
+            //alert( "回调成功！"+data);
+            //alert(data.con);
+            tbl = jQuery("#tblContent"); 
+            jQuery("#tblContent").attr('ids',data.con);
+            tbl.children().remove();
+            var tr,td;
+            for(var i=0, j=data.startId; i<data.data.length; i++,j++){
+                tr = $('<tr align="center"></tr>');
+                td = $("<td></td>");
+                td.append('<input type="checkbox" name="box" id='+data.data[i].id+'>');
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].username);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].chinaName);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(shows(data.data[i].classes));
+                tr.append(td);
+                td = $("<td></td>");
+                td.append(data.data[i].datetime);
+                tr.append(td);
+                td = $("<td></td>");
+                td.append('&nbsp;&nbsp;&nbsp;');
+                a=$("<a>编辑</a>");
+                a.attr('href','editUser'+'?eid='+data.data[i].id);
+                td.append(a);
+                td.append('&nbsp;&nbsp;&nbsp;');
+                a=$('<a>'+change(data.data[i].status)+'</a>');
+                a.attr('href','#');
+                a.attr('id','btn_'+(i+1)+'');
+                a.attr('data',data.data[i].status);
+                a.attr('onclick','changeStatus('+data.data[i].id+','+(i+1)+')')
+                td.append(a);
+                td.append('&nbsp;&nbsp;&nbsp;');
+                tr.append(td);
+                tbl.append(tr);
+             }
+        }
+    });
+}
+
+function shows(classes){
+	if (classes == "admin"){
+		return '管理员'
+	} else if(classes == 'user'){
+		return '用户'
+	}else{
+		return '访客'
+	}
+	
+}
+
+function change(status){
+	if (status =="0"){
+	   return '激活';
+	}else if(status == "1"){
+		return "冻结";
+	}
+}
+
+{{end}}

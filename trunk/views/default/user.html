@@ -1,0 +1,21 @@
+{{header = False}}
+{{sidebar = False}}
+{{extend 'layout.html'}}
+{{block log}}
+    <section  align="center" style="background:#ededed;color:#999;"id="error-container">
+    	
+        <div class="block-error">
+               <header>
+                 <h1 >权限不够，请咨询管理员</h1>
+                <p class="text-center">Something went wrong.</p>
+                <div  style="width:100%;">
+                    <a class="btn btn-primary btn-block" href="{{=URL('admin','login')}}">返回</a>
+                </div>
+             </header>
+            
+                
+           
+        </div>
+        
+    </section>
+{{end}}

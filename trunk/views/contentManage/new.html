@@ -1,0 +1,57 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+{{extend 'layout.html'}}
+{{block head}}
+<style>
+.block-margin{
+    margin:5px 5px 5px 5px;
+}
+</style>
+{{end}}
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+            <div class="panel-body bt-border">
+                <div class="form-horizontal" role="form">
+                    {{=form.custom.begin}}
+                    <table width="500" border="0" cellspacing="0" cellpadding="0">
+                        <tr>
+                            <td align="right" width="155">专辑：</td>
+                            <td width="245">{{=form.custom.widget.album}}</td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">频道：</td>
+                            <td width="245">{{=form.custom.widget.channel}}</td>
+                        </tr>
+                        <tr>
+                            <td align="right" width="155">地区：</td>
+                            <td width="245">{{=form.custom.widget.area}}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div class="col-md-12 ml20 mt15">
+            {{=form.custom.submit}}
+            </div>
+            {{=form.custom.end}}
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{block  script}}
+jQuery('#no_table_channel').attr('class','form-control');
+jQuery('#no_table_area').attr('class','form-control');
+jQuery('#no_table_album').attr('class','form-control');
+jQuery('#no_table_director').attr('class','form-control');
+jQuery('#no_table_director').attr('style','height:70px;');
+jQuery('#no_table_actor').attr('class','form-control');
+jQuery('#no_table_actor').attr('style','height:70px;margin:10px 0px 0px;');
+jQuery('#sub').attr('class','btn btn-primary block-margin');
+jQuery('#cancel').attr('class','btn block-margin');
+jQuery('#cancel').click(function(){
+        window.location = "{{=URL('index')}}";
+});
+{{end}}

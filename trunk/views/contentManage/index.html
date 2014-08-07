@@ -1,0 +1,278 @@
+{{header = True}}
+{{sidebar = True}}
+{{bread = True}}
+
+{{extend 'layout.html'}}
+
+{{block head}}
+<link rel="stylesheet"  href="{{=URL('static','plupload/js/jquery.plupload.queue/css/jquery.plupload.queue.css')}}">
+<link rel="stylesheet"  href="{{=URL('static','plupload/js/jquery.ui.plupload/css/jquery.ui.plupload.css')}}">
+<script type="text/javascript" src="{{=URL('static','plupload/js/plupload.full.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','plupload/js/jquery.plupload.queue/jquery.plupload.queue.min.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','plupload/js/jquery.ui.plupload/jquery.ui.plupload.js')}}"></script>
+<script type="text/javascript" src="{{=URL('static','plupload/js/i18n/zh_CN.js')}}"></script> 
+<script type="text/javascript" src="{{=URL('static','assets/js/CustomPagination.js')}}"></script> 
+<link rel="stylesheet" href="{{=URL('static','assets/plugins/icheck/css/_all.css')}}">
+<script src="{{=URL('static','assets/plugins/icheck/js/icheck.min.js')}}"></script>
+<script src="{{=URL('static','js/cntInx.js')}}"></script>
+{{end}}
+
+{{block content}}
+<div class="row">
+    <div class="col-md-12">
+        <div class="panel panel-default">
+           <div class="panel-body">
+                <div class="table-control">
+                    {{=form.custom.begin}}
+                    <table class="bq">
+                        <tr>
+                            <td width="5%" align="right">频道：</td>
+                            <td width="10%" align="left">{{=form.custom.widget.channel}}</td>
+                            <td width="5%" align="right">地区：</td>
+                            <td width="10%" align="left">{{=form.custom.widget.area}}</td>
+                            <td width="10%" align="center">{{=form.custom.submit}}</td>
+                            <td colspan="5 width="60%"></td>
+                        </tr>
+                    </table>
+                    {{=form.custom.end}}
+                </div>
+            </div>
+
+            <div class="panel-body">
+            	{{if auth.user.classes !="visit":}}
+                <div class="add-user">
+                    <button id="upContent" data-toggle="modal"  data-target="#basicModal" type="button" class="btn btn-primary"  style="margin-top:5px;margin-right:10px;">上传内容库</button>
+                    <button onclick="downContent(this)"  data-toggle="modal" data-target="#downModal" type="button" class="btn btn-primary" style="margin-top:5px;margin-right:10px;">下载内容库</button>
+                    <a href="{{=URL('new')}}"> <button type="button" class="btn btn-primary" style="margin-top:5px">新增内容</button></a>
+                </div>      
+                {{pass}}
+                <table class="table" style="margin-top:5px">
+                    <thead>
+                        <tr>
+                            <th width="5%">编号</th>
+                            <th width="10%">album</th>
+                            <th width="10%">channel</th>
+                            <th width="10%">area</th>
+                            <th width="10%">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblContent" channel="{{=find['channel']}}" area="{{=find['area']}}">
+                        {{ for i, r in enumerate(data):}}
+                        <tr align="center">
+                            <td>{{=i+1}}</td>
+                            <td>{{=r.album}}</td>
+                            <td>{{=r.channel}}</td>
+                            <td>{{=r.area}}</td>
+                            <td>
+                                <a href="{{=URL('conEdit',vars=dict(ids=r.c_id))}}">编辑</a>&nbsp;&nbsp;
+                                <a href="#" onclick="change({{=r.c_id}},'{{=r.album}}')"  data-toggle="modal" data-target="#dlgDel">删除</a>
+						    </td>
+                        </tr> 
+                        {{pass}}            
+                    </tbody>
+                </table>
+                <div class="mpage">
+                    <div class="col-xs-6">
+                        <div class="dataTables_info">共 {{=count}} 条信息</div>
+                    </div>
+                    <div class="col-xs-6">
+                        <div id="contentPaginate"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+</div>
+
+<div class="modal fade in" id="downModal" tabindex="-1" role="dialog" aria-labelledby="downModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="downModalLabel"></h4>
+            </div>
+            <div class="modal-body">
+                <div class="progress">
+                    <div id="downProgress" class="progress-bar progress-bar-success" style="width: 10%">10%</div>
+                </div>
+                <p></p>
+            </div>
+            <div class="modal-footer">
+                <button id="cancelDown" type="button" class="btn btn-primary" data-dismiss="modal">取消</button>
+           </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="basicModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div type="button" id="close_button" class="close" data-dismiss="modal" aria-hidden="true">×</div>
+                <h4 class="modal-title" id="myModalLabel">上传内容库：</h4>
+            </div> 
+            <div class="panel">
+                <div class="panel-body">
+                    <label class="radio-inline">
+                        <input class="icheck" type="radio" checked="" name="rad1" value="append">
+                        追加  ( 不删除原有记录，直接添加 )
+                    </label>
+                    <label class="radio-inline">
+                        <input class="icheck" type="radio" name="rad1" value="all">
+                        替换  ( 先删除所有记录，再添加 )
+                    </label>
+            </div>
+            </div>
+            <form id ='uploadForms' class="modal-body">
+                <div id='upload'></div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="dlgDel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                <h4 class="modal-title" id="myModalLabel">提示</h4>
+            </div>
+            <div align="center" class="modal-body">
+               <p></p> 
+            </div>
+            <div class="modal-footer">
+                <button type="button" id='sure'  class="btn btn-primary">确定</button>
+                <button type="button" id="can" class="btn btn-default" data-dismiss="modal">取消</button>
+            </div>
+        </div>
+    </div>
+</div>
+{{end}}
+
+{{block script}}
+urlContentDown = "{{=URL('downContent')}}";
+urlGetTaskProgress = "{{=URL('getTaskProgress')}}";
+
+jQuery('#no_table_channel').attr('class','form-control-01 ');
+jQuery('#no_table_channel option:first').remove();
+jQuery('#no_table_channel').val("{{=find['channel']}}");
+jQuery('#no_table_area').attr('class','form-control-01');
+jQuery('#no_table_area option:first').remove();
+jQuery('#no_table_area').val("{{=find['area']}}");
+jQuery('#sub').attr('class','btn btn-primary block-margin');
+jQuery('#sure').click(function(){
+    $.ajax({
+        type:'POST',
+        url:"{{=URL('contentManage','conDelete')}}",
+        data:{'ids':$(this).attr('values')},
+        dataType:'text',
+        success:function(msg){
+            if(msg == 'ok'){
+                location.reload();
+            }
+        }
+    });
+})
+
+timer = new Array();
+options = {
+    'callback': getPaginationInfo,
+    'paginationUrl': "{{=URL('contentPaginate')}}",
+    'fieldText':'跳转到'
+}
+jQuery("#contentPaginate").pagination({{=pageCount}}, 1, options);
+
+function plupload(){
+    $("#upload").pluploadQueue({
+        runtimes : 'gears,flash,silverlight,browserplus,html5',
+        url:'{{=URL('uploadFiles')}}',
+        rename: true,
+        //dragdrop: true,
+        chunk_size : '2mb',
+        //multiple_queues: true,
+        unique_names: true,
+        flash_swf_url:'{{=URL('static','plupload/js/Moxie.swf')}}',
+        filters: [{ title: "file", extensions: "csv" },],
+        silverlight_xap_url: '{{=URL('static','plupload/js/Moxie.xap')}}',
+        //multipart:false,
+        //multipart_params: {'mode':'append'},
+    });
+}
+
+$('#upContent').click(function(){
+    var valm = $("#basicModal").attr('class');
+    var sty = $("#basicModal").css('display');
+    if(valm == "modal fade" | sty =="none;"){
+        $("#basicModal").attr("class",'modal fade in');
+        $("#basicModal").css('display','block');
+    }else{
+        $("#basicModal").attr("class",'modal fade');
+        $("#basicModal").css('display','none');
+    }
+    $("#downModal p").text("");
+    var i = $("#basicModal .icheck");
+    i.parent().removeClass('checked');
+    $(i[0]).parent().addClass('checked');
+    plupload();
+    var upload = $("#upload").pluploadQueue();
+    upload.bind('FilesAdded',function(up, files){
+        $.each(files,function(i,file){
+            if(up.files.length > 1){
+                up.removeFile(file);
+            }
+        });
+    });
+
+    upload.bind('BeforeUpload', function(up, file){   
+        this.setOption('multipart_params', 
+                                  {'mode':$("#basicModal .icheck:checked").val()});  
+    });
+   
+    upload.bind('FileUploaded', function(up, file, res) {
+        //alert(res.response);
+        $("#basicModal").attr("class",'modal fade');
+        $("#basicModal").css('display','none'); 
+        $(".modal-backdrop").remove();
+        // 上传回调函数
+        jQuery("#downModal").css('display','block'); 
+        jQuery("#downModalLabel").text("正在保存数据"); 
+        jQuery("#downProgress").text("5%");   
+        jQuery("#downProgress").attr("style", "width: 5%");
+        jQuery("#cancelDown").click(function(){
+            bCancel = true; 
+            jQuery("#downModal").css('display','none'); 
+        });
+  
+        var t = setInterval(function(){
+            $.ajax({
+                type: "post",
+                url: "{{=URL('getTaskProgress')}}",
+                data: {"taskId":res.response},
+                dataType: "json",
+                success:function(msg){
+                    //alert(JSON.stringify(msg));
+                    jQuery("#downProgress").text(msg.progress);   
+                    jQuery("#downProgress").attr("style", "width: "+msg.progress);
+                    if(msg.status=="COMPLETED"){
+                      clearInterval(t);
+                      switch(msg.result ){
+                           case '0':
+                               $("#downModal").css('display','none'); 
+                               window.location = "{{=URL('index')}}";
+                               break;
+                           case '-101':
+                               $("#downModal p").text("失败：内容不匹配！");
+                               break;
+                       }
+                    }
+                }
+            }); },2000); 
+
+            jQuery("#cancelDown").click(function(){
+                clearInterval(t)
+            });
+    });
+});
+
+$("input.icheck").iCheck({radioClass:'iradio_flat-grey'});
+
+{{end}}
